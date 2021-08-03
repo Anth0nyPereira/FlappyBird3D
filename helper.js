@@ -16,7 +16,7 @@ const helper = {
         const width = window.innerWidth;
         const height = window.innerHeight;
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
-        camera.position.set(0, 20, 150);
+        camera.position.set(0, 40, 150);
         sceneElements.camera = camera;
 
         // ************************** //
