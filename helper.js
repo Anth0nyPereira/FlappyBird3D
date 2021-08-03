@@ -36,22 +36,6 @@ const helper = {
         const ambientLight = new THREE.AmbientLight('rgb(255, 255, 255)', 0.2);
         sceneElements.sceneGraph.add(ambientLight);
 
-        // ***************************** //
-        // Add spotlight (with shadows)
-        // ***************************** //
-        const spotLight = new THREE.SpotLight('rgb(255, 255, 255)', 0.8);
-        spotLight.position.set(-5, 8, 0);
-        sceneElements.sceneGraph.add(spotLight);
-
-        // Setup shadow properties for the spotlight
-        spotLight.castShadow = true;
-        spotLight.shadow.mapSize.width = 2048;
-        spotLight.shadow.mapSize.height = 2048;
-
-        // Give a name to the spot light
-        spotLight.name = "light";
-
-
         // *********************************** //
         // Create renderer (with shadow map)
         // *********************************** //

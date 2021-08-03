@@ -99,61 +99,6 @@ function load3DObjects(sceneGraph) {
     planeObject.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
     // Set shadow property
     planeObject.receiveShadow = true;
-
-
-    // ************************** //
-    // Create a cube
-    // ************************** //
-    // Cube center is at (0,0,0)
-    const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-    const cubeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(255,0,0)' });
-    const cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    sceneGraph.add(cubeObject);
-
-    // Set position of the cube
-    // The base of the cube will be on the plane 
-    cubeObject.translateY(0.5);
-
-    // Set shadow property
-    cubeObject.castShadow = true;
-    cubeObject.receiveShadow = true;
-
-    // Name
-    cubeObject.name = "cube";
-
-    // ************************** //
-    // Create a sphere
-    // ************************** //
-    // Sphere center is at (0,0,0)
-    const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-    const sphereMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(180,180,255)' });
-    const sphereObject = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    sceneGraph.add(sphereObject);
-
-    // Set position of the sphere
-    // Move to the left and away from (0,0,0)
-    // The sphere touches the plane
-    sphereObject.translateX(-1.2).translateY(0.5).translateZ(-0.5);
-
-    // Set shadow property
-    sphereObject.castShadow = true;
-
-
-    // ************************** //
-    // Create a cylinder
-    // ************************** //
-    const cylinderGeometry = new THREE.CylinderGeometry(0.2, 0.2, 1.5, 25, 1);
-    const cylinderMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(200,255,150)' });
-    const cylinderObject = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
-    sceneGraph.add(cylinderObject);
-
-    // Set position of the cylinder
-    // Move to the right and towards the camera
-    // The base of the cylinder is on the plane
-    cylinderObject.translateX(0.5).translateY(0.75).translateZ(1.5);
-
-    // Set shadow property
-    cylinderObject.castShadow = true;
 }
 
 // Displacement value
@@ -163,37 +108,6 @@ var delta = 0.1;
 var dispX = 0.2, dispZ = 0.2;
 
 function computeFrame(time) {
-
-    // THE SPOT LIGHT
-
-    // Can extract an object from the scene Graph from its name
-    const light = sceneElements.sceneGraph.getObjectByName("light");
-
-    // Apply a small displacement
-
-    if (light.position.x >= 10) {
-        delta *= -1;
-    } else if (light.position.x <= -10) {
-        delta *= -1;
-    }
-    light.translateX(delta);
-
-    // CONTROLING THE CUBE WITH THE KEYBOARD
-
-    const cube = sceneElements.sceneGraph.getObjectByName("cube");
-
-    if (keyD && cube.position.x < 2.5) {
-        cube.translateX(dispX);
-    }
-    if (keyW && cube.position.z > -2.5) {
-        cube.translateZ(-dispZ);
-    }
-    if (keyA && cube.position.x > -2.5) {
-        cube.translateX(-dispX);
-    }
-    if (keyS && cube.position.z < 2.5) {
-        cube.translateZ(dispZ);
-    }
 
     // Rendering
     helper.render(sceneElements);
