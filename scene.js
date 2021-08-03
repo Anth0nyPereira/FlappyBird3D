@@ -140,16 +140,13 @@ var delta = 0.1;
 var dispX = 0.2, dispZ = 0.2;
 
 function computeFrame(time) {
-
-    var camera = sceneElements.camera;
-    camera.position.z -= 0.5;
-    var direction = new THREE.Vector3(0, 0, -1);
-    camera.lookAt(direction);
-    /*
+    sceneElements.camera.position.z -= 0.5;
+    sceneElements.control.target = new THREE.Vector3(0, 0, -Math.pow(10, 10));
+    
     var target = new THREE.Vector3();
-    console.log(camera.getWorldPosition(target));
-    console.log(camera);
-    */
+    console.log(sceneElements.camera.getWorldPosition(target));
+    console.log(sceneElements.camera);
+    
 
     // Rendering
     helper.render(sceneElements);

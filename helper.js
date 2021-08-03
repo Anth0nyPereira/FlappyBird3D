@@ -1,11 +1,5 @@
 "use strict";
 
-//  Adapted from Daniel Rohmer tutorial
-//
-// 		https://imagecomputing.net/damien.rohmer/teaching/2019_2020/semester_1/MPRI_2-39/practice/threejs/content/000_threejs_tutorial/index.html
-//
-// 		J. Madeira - April 2021
-
 const helper = {
 
     initEmptyScene: function (sceneElements) {
@@ -23,9 +17,6 @@ const helper = {
         const height = window.innerHeight;
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
         camera.position.set(0, 20, 150);
-        var direction = new THREE.Vector3(0, 0, -1);
-        camera.lookAt(direction);
-
         sceneElements.camera = camera;
 
         // ************************** //
@@ -63,6 +54,7 @@ const helper = {
         // ************************** //
         sceneElements.control = new THREE.OrbitControls(camera, renderer.domElement);
         sceneElements.control.screenSpacePanning = true;
+        sceneElements.control.target = new THREE.Vector3(0, 0, -Math.pow(10, 10));
 
 
     },
