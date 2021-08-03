@@ -72,12 +72,11 @@ function onDocumentKeyUp(event) {
     }
 }
 
-function createStar() {
+function createStar(height) {
     var star = new THREE.Group();
 
     var radiusTop = 4;  
-    var radiusBottom = 4;  
-    var height =  6.8;  
+    var radiusBottom = 4;   
     var radialSegments =  3;  
     var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments);
     var material = new THREE.MeshBasicMaterial({color: 0xffff00});
@@ -85,19 +84,36 @@ function createStar() {
     var star2 = new THREE.Mesh(geometry, material);
     star2.rotation.y = Math.PI;
 
+    var line1 = addLineSegment(geometry, 0xfe1493);
+    var line2 = addLineSegment(geometry, 0xfe1493);
+    line2.rotation.y = Math.PI;
+
     star.add(star1);
     star.add(star2);
+
+    star.add(line1);
+    star.add(line2);
     return star;
 }
 
+function addLineSegment(geometry, color) {
+    var edgesGeometry = new THREE.EdgesGeometry(geometry);
+    var material = new THREE.LineBasicMaterial({color: color, linewidth: 50});
+    var line = new THREE.LineSegments(edgesGeometry, material);
+    return line;
+}
 
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
+    // Add axes helper
+    var axesHelper = new THREE.AxesHelper(500);
+    sceneElements.sceneGraph.add(axesHelper);
+
     // ************************** //
     // Create a ground plane
     // ************************** //
-    const planeGeometry = new THREE.PlaneGeometry(100, 100);
+    const planeGeometry = new THREE.PlaneGeometry(500, 500);
     const planeMaterial = new THREE.MeshPhongMaterial({ color: 'rgb(200, 200, 200)', side: THREE.DoubleSide });
     const planeObject = new THREE.Mesh(planeGeometry, planeMaterial);
     sceneGraph.add(planeObject);
@@ -108,9 +124,13 @@ function load3DObjects(sceneGraph) {
     planeObject.receiveShadow = true;
 
     // Create first star-obstacle
-    var star1 = createStar();
-    star1.position.y = 5;
+    var star1 = createStar(10);
+    star1.position.y = 50;
     sceneElements.sceneGraph.add(star1);
+
+    var star2 = createStar(5);
+    star2.position.y = 20;
+    sceneElements.sceneGraph.add(star2);
 }
 
 // Displacement value
@@ -120,6 +140,16 @@ var delta = 0.1;
 var dispX = 0.2, dispZ = 0.2;
 
 function computeFrame(time) {
+
+    var camera = sceneElements.camera;
+    camera.position.z -= 0.5;
+    var direction = new THREE.Vector3(0, 0, -1);
+    camera.lookAt(direction);
+    /*
+    var target = new THREE.Vector3();
+    console.log(camera.getWorldPosition(target));
+    console.log(camera);
+    */
 
     // Rendering
     helper.render(sceneElements);

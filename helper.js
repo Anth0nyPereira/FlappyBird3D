@@ -22,9 +22,11 @@ const helper = {
         const width = window.innerWidth;
         const height = window.innerHeight;
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
+        camera.position.set(0, 20, 150);
+        var direction = new THREE.Vector3(0, 0, -1);
+        camera.lookAt(direction);
+
         sceneElements.camera = camera;
-        camera.position.set(0, 5, 5);
-        camera.lookAt(0, 0, 0);
 
         // ************************** //
         // Illumination
