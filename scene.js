@@ -103,6 +103,15 @@ function addLineSegment(geometry, color) {
     return line;
 }
 
+function createBird() {
+    var radius = 5;  
+    var detail = 5;  
+    var geometry = new THREE.TetrahedronGeometry(radius, detail);
+    var material = new THREE.MeshBasicMaterial({color: 0x0000ff});
+    var mesh = new THREE.Mesh(geometry, material);
+    return mesh;
+}
+
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
@@ -123,14 +132,33 @@ function load3DObjects(sceneGraph) {
     // Set shadow property
     planeObject.receiveShadow = true;
 
+    // Create bird
+    var bird = createBird();
+    var target = new THREE.Vector3();
+    bird.position.set(sceneElements.camera.getWorldPosition(target).x, sceneElements.camera.getWorldPosition(target).y, sceneElements.camera.getWorldPosition(target).z - 50);
+    bird.name = "bird";
+    sceneElements.sceneGraph.add(bird);
+
     // Create first star-obstacle
     var star1 = createStar(10);
     star1.position.y = 50;
     sceneElements.sceneGraph.add(star1);
 
     var star2 = createStar(5);
-    star2.position.y = 20;
+    star2.position.y = 25;
     sceneElements.sceneGraph.add(star2);
+
+    // second obstacle - for testing purposes
+
+    var star3 = createStar(10);
+    star3.position.y = 50;
+    star3.position.z = -30;
+    sceneElements.sceneGraph.add(star3);
+
+    var star4 = createStar(5);
+    star4.position.y = 25;
+    star4.position.z = -30;
+    sceneElements.sceneGraph.add(star4);
 }
 
 // Displacement value
@@ -142,10 +170,15 @@ var dispX = 0.2, dispZ = 0.2;
 function computeFrame(time) {
     sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(0, 0, -Math.pow(10, 10));
+
+    var bird = sceneElements.sceneGraph.getObjectByName("bird");
+    bird.position.z -= 0.5;
     
     var target = new THREE.Vector3();
+    /*
     console.log(sceneElements.camera.getWorldPosition(target));
     console.log(sceneElements.camera);
+    */
     
 
     // Rendering
