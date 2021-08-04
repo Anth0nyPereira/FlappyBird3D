@@ -6,6 +6,7 @@ const sceneElements = {
     camera: null,
     control: null,  // NEW
     renderer: null,
+    birdInitialPosition: null,
 };
 
 
@@ -24,7 +25,7 @@ requestAnimationFrame(computeFrame);
 window.addEventListener('resize', resizeWindow);
 
 //To keep track of the keyboard - WASD
-var keyD = false, keyA = false, keyS = false, keyW = false;
+var space = false;
 document.addEventListener('keydown', onDocumentKeyDown, false);
 document.addEventListener('keyup', onDocumentKeyUp, false);
 
@@ -41,33 +42,15 @@ function resizeWindow(eventParam) {
 
 function onDocumentKeyDown(event) {
     switch (event.keyCode) {
-        case 68: //d
-            keyD = true;
-            break;
-        case 83: //s
-            keyS = true;
-            break;
-        case 65: //a
-            keyA = true;
-            break;
-        case 87: //w
-            keyW = true;
+        case 32: // space
+            space = true;
             break;
     }
 }
 function onDocumentKeyUp(event) {
     switch (event.keyCode) {
-        case 68: //d
-            keyD = false;
-            break;
-        case 83: //s
-            keyS = false;
-            break;
-        case 65: //a
-            keyA = false;
-            break;
-        case 87: //w
-            keyW = false;
+        case 32: // space
+            space = false;
             break;
     }
 }
@@ -159,6 +142,9 @@ function load3DObjects(sceneGraph) {
     star4.position.y = 25;
     star4.position.z = -30;
     sceneElements.sceneGraph.add(star4);
+
+    // Initialize bird initial position array
+    sceneElements.birdInitialPosition = [];
 }
 
 // Displacement value
@@ -166,6 +152,12 @@ function load3DObjects(sceneGraph) {
 var delta = 0.1;
 
 var dispX = 0.2, dispZ = 0.2;
+
+var deltaBirdY = 0.2;
+
+var birdFlag = true;
+
+var times = 0;
 
 function computeFrame(time) {
     sceneElements.camera.position.z -= 0.5;
@@ -180,6 +172,33 @@ function computeFrame(time) {
     console.log(sceneElements.camera);
     */
     
+    // Position-y of bird increases when pressing space
+    
+    if (space) {
+        var initialPosition = bird.position.y;
+        if (sceneElements.birdInitialPosition.length > 0 && birdFlag) {
+            if (Math.abs(sceneElements.birdInitialPosition[0] - initialPosition) >= 5) {
+                //deltaBirdY *= -1; 
+                sceneElements.birdInitialPosition = [];
+                birdFlag = false;
+                console.log(birdFlag);
+            }
+        }
+
+        if (birdFlag) {
+            sceneElements.birdInitialPosition.push(initialPosition);
+            //console.log(sceneElements.birdInitialPosition);
+            bird.position.y += 2*deltaBirdY;
+        } else if (!birdFlag) {
+            bird.position.y -= deltaBirdY;
+        }
+        
+
+    } else if (!space) {
+        bird.position.y -= deltaBirdY;
+        birdFlag = true;
+        console.log(birdFlag);
+    }
 
     // Rendering
     helper.render(sceneElements);
@@ -189,4 +208,4 @@ function computeFrame(time) {
 
     // Call for the next frame
     requestAnimationFrame(computeFrame);
-}
+} 
