@@ -9,11 +9,6 @@ const sceneElements = {
     birdInitialPosition: null,
 };
 
-
-// Functions are called
-//  1. Initialize the empty scene
-//  2. Add elements within the scene
-//  3. Animate
 helper.initEmptyScene(sceneElements);
 load3DObjects(sceneElements.sceneGraph);
 requestAnimationFrame(computeFrame);
