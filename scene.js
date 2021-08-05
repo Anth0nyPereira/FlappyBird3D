@@ -90,6 +90,32 @@ function createBird() {
     return mesh;
 }
 
+// function that will return an obstacle already made of 2 stars that only has the centering position and the height of the hole between the two poles
+function createObstacle(centerPosition, holeHeight) {
+
+    var obstacle = new THREE.Group();
+    
+    // first, let's create the star at the bottom
+    var star1Height = centerPosition - holeHeight/2;
+    var star1 = createStar(star1Height);
+    star1.position.y = star1Height/2;
+
+    // now, the second star at the top
+    // let's define a maximum value for the height of an obstacle (conjunction of two stars) --> 500 of height
+
+    var star2Height = 500 - holeHeight - star1Height;
+    var star2 = createStar(star2Height);
+    star2.position.y = star2Height/2 + holeHeight + star1Height;
+
+    obstacle.add(star1);
+    console.log(star1.position);
+    console.log(star1Height);
+    obstacle.add(star2);
+    console.log(star2.position);
+    console.log(star2Height);
+    return obstacle;
+}
+
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
@@ -117,6 +143,7 @@ function load3DObjects(sceneGraph) {
     bird.name = "bird";
     sceneElements.sceneGraph.add(bird);
 
+    /*
     // Create first star-obstacle
     var star1 = createStar(10);
     star1.position.y = 50;
@@ -137,6 +164,10 @@ function load3DObjects(sceneGraph) {
     star4.position.y = 25;
     star4.position.z = -30;
     sceneElements.sceneGraph.add(star4);
+    */
+
+    var obstacle1 = createObstacle(40, 20);
+    sceneElements.sceneGraph.add(obstacle1);
 
     // Initialize bird initial position array
     sceneElements.birdInitialPosition = [];
@@ -176,7 +207,7 @@ function computeFrame(time) {
                 //deltaBirdY *= -1; 
                 sceneElements.birdInitialPosition = [];
                 birdFlag = false;
-                console.log(birdFlag);
+                //console.log(birdFlag);
             }
         }
 
@@ -192,7 +223,7 @@ function computeFrame(time) {
     } else if (!space) {
         bird.position.y -= deltaBirdY;
         birdFlag = true;
-        console.log(birdFlag);
+        //console.log(birdFlag);
     }
 
     // Rendering
