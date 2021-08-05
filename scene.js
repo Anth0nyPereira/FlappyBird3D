@@ -116,6 +116,11 @@ function createObstacle(centerPosition, holeHeight) {
     return obstacle;
 }
 
+// function to return a random integer between two values
+function randomIntFromInterval(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
