@@ -4,7 +4,7 @@
 const sceneElements = {
     sceneGraph: null,
     camera: null,
-    control: null,  // NEW
+    control: null,  
     renderer: null,
     birdInitialPosition: null,
 };
@@ -82,7 +82,7 @@ function addLineSegment(geometry, color) {
 }
 
 function createBird() {
-    var radius = 5;  
+    var radius = 2;  
     var detail = 5;  
     var geometry = new THREE.TetrahedronGeometry(radius, detail);
     var material = new THREE.MeshBasicMaterial({color: 0x0000ff});
@@ -108,11 +108,7 @@ function createObstacle(centerPosition, holeHeight) {
     star2.position.y = star2Height/2 + holeHeight + star1Height;
 
     obstacle.add(star1);
-    console.log(star1.position);
-    console.log(star1Height);
     obstacle.add(star2);
-    console.log(star2.position);
-    console.log(star2Height);
     return obstacle;
 }
 
@@ -144,12 +140,12 @@ function load3DObjects(sceneGraph) {
     // Create bird
     var bird = createBird();
     var target = new THREE.Vector3();
-    bird.position.set(sceneElements.camera.getWorldPosition(target).x, sceneElements.camera.getWorldPosition(target).y, sceneElements.camera.getWorldPosition(target).z - 50);
+    bird.position.set(0, sceneElements.camera.getWorldPosition(target).y, sceneElements.camera.getWorldPosition(target).z);
     bird.name = "bird";
     sceneElements.sceneGraph.add(bird);
 
-    var obstacle1 = createObstacle(40, 20);
-    sceneElements.sceneGraph.add(obstacle1);
+    //var obstacle1 = createObstacle(40, 20);
+    //sceneElements.sceneGraph.add(obstacle1);
 
     // Initialize bird initial position array
     sceneElements.birdInitialPosition = [];
@@ -167,9 +163,11 @@ var birdFlag = true;
 
 var times = 0;
 
+var obstaclePosition = sceneElements.camera.position.z - 100;
+
 function computeFrame(time) {
     sceneElements.camera.position.z -= 0.5;
-    sceneElements.control.target = new THREE.Vector3(0, 0, -Math.pow(10, 10));
+    sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
 
     var bird = sceneElements.sceneGraph.getObjectByName("bird");
     bird.position.z -= 0.5;
@@ -179,6 +177,16 @@ function computeFrame(time) {
     console.log(sceneElements.camera.getWorldPosition(target));
     console.log(sceneElements.camera);
     */
+
+    // Adding obstacles loop
+    var obstacle = createObstacle(randomIntFromInterval(20, 60), 10);
+    obstacle.position.z = obstaclePosition;
+    if (obstacle.position.z < 0) {
+        console.log(obstacle.position.z);
+    }
+    
+    obstaclePosition -= 50;
+    sceneElements.sceneGraph.add(obstacle);
     
     // Position-y of bird increases when pressing space
     

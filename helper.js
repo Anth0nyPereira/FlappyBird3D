@@ -12,7 +12,8 @@ const helper = {
         const width = window.innerWidth;
         const height = window.innerHeight;
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 500);
-        camera.position.set(0, 40, 150);
+        // var camera = new THREE.OrthographicCamera(window.innerWidth / - 16, window.innerWidth / 16,window.innerHeight / 16, window.innerHeight / - 16, -200, 500 );
+        camera.position.set(65, 40, 200);
         sceneElements.camera = camera;
 
         // Add ambient light
@@ -38,7 +39,7 @@ const helper = {
         // Control for the camera
         sceneElements.control = new THREE.OrbitControls(camera, renderer.domElement);
         sceneElements.control.screenSpacePanning = true;
-        sceneElements.control.target = new THREE.Vector3(0, 0, -Math.pow(10, 10));
+        sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
 
 
     },
