@@ -7,6 +7,7 @@ const sceneElements = {
     control: null,  
     renderer: null,
     birdInitialPosition: null,
+    centerPositionValues: null,
 };
 
 helper.initEmptyScene(sceneElements);
@@ -149,6 +150,9 @@ function load3DObjects(sceneGraph) {
 
     // Initialize bird initial position array
     sceneElements.birdInitialPosition = [];
+
+    // Initialize values of the center of each obstacle's hole
+    sceneElements.centerPositionValues = [];
 }
 
 // Displacement value
@@ -179,7 +183,14 @@ function computeFrame(time) {
     */
 
     // Adding obstacles loop
-    var obstacle = createObstacle(randomIntFromInterval(20, 60), 10);
+    var centerPosition = randomIntFromInterval(20, 60);
+    if (sceneElements.centerPositionValues.length >= 2) {
+        while (Math.abs(sceneElements.centerPositionValues[sceneElements.centerPositionValues.length - 1] - centerPosition) > 20) {
+            centerPosition = randomIntFromInterval(20, 60);
+        }
+    }
+    sceneElements.centerPositionValues.push(centerPosition);
+    var obstacle = createObstacle(centerPosition, 10);
     obstacle.position.z = obstaclePosition;
     if (obstacle.position.z < 0) {
         console.log(obstacle.position.z);
@@ -193,7 +204,7 @@ function computeFrame(time) {
     if (space) {
         var initialPosition = bird.position.y;
         if (sceneElements.birdInitialPosition.length > 0 && birdFlag) {
-            if (Math.abs(sceneElements.birdInitialPosition[0] - initialPosition) >= 5) {
+            if (Math.abs(sceneElements.birdInitialPosition[0] - initialPosition) >= 6) {
                 //deltaBirdY *= -1; 
                 sceneElements.birdInitialPosition = [];
                 birdFlag = false;
@@ -204,14 +215,14 @@ function computeFrame(time) {
         if (birdFlag) {
             sceneElements.birdInitialPosition.push(initialPosition);
             //console.log(sceneElements.birdInitialPosition);
-            bird.position.y += 2*deltaBirdY;
+            bird.position.y += 6*deltaBirdY;
         } else if (!birdFlag) {
-            bird.position.y -= deltaBirdY;
+            bird.position.y -= 3*deltaBirdY;
         }
         
 
     } else if (!space) {
-        bird.position.y -= deltaBirdY;
+        bird.position.y -= 3*deltaBirdY;
         birdFlag = true;
         //console.log(birdFlag);
     }
