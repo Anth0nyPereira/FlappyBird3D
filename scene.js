@@ -148,29 +148,6 @@ function load3DObjects(sceneGraph) {
     bird.name = "bird";
     sceneElements.sceneGraph.add(bird);
 
-    /*
-    // Create first star-obstacle
-    var star1 = createStar(10);
-    star1.position.y = 50;
-    sceneElements.sceneGraph.add(star1);
-
-    var star2 = createStar(5);
-    star2.position.y = 25;
-    sceneElements.sceneGraph.add(star2);
-
-    // second obstacle - for testing purposes
-
-    var star3 = createStar(10);
-    star3.position.y = 50;
-    star3.position.z = -30;
-    sceneElements.sceneGraph.add(star3);
-
-    var star4 = createStar(5);
-    star4.position.y = 25;
-    star4.position.z = -30;
-    sceneElements.sceneGraph.add(star4);
-    */
-
     var obstacle1 = createObstacle(40, 20);
     sceneElements.sceneGraph.add(obstacle1);
 
