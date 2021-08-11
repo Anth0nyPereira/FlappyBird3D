@@ -8,6 +8,7 @@ const sceneElements = {
     renderer: null,
     birdInitialPosition: null,
     centerPositionValues: null,
+    obstaclesGroup: null,
 };
 
 helper.initEmptyScene(sceneElements);
@@ -110,12 +111,36 @@ function createObstacle(centerPosition, holeHeight) {
 
     obstacle.add(star1);
     obstacle.add(star2);
+
+    sceneElements.obstaclesGroup.push(obstacle);
     return obstacle;
 }
 
 // function to return a random integer between two values
 function randomIntFromInterval(min, max) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function birdIntersectsObstacle() {
+    var bird = sceneElements.sceneGraph.getObjectByName("bird");
+    var raycaster = new THREE.Raycaster();
+    raycaster.set(new THREE.Vector3(bird.position.x, bird.position.y, bird.position.z), new THREE.Vector3(-1, 0, 0));
+    if (sceneElements.obstaclesGroup.length > 0) {
+        for (var i=parseInt(sceneElements.obstaclesGroup[0].name); i<parseInt(sceneElements.obstaclesGroup[sceneElements.obstaclesGroup.length - 1].name); i++) {
+            console.log(sceneElements.obstaclesGroup[i]);
+            var intersects = raycaster.intersectObjects(sceneElements.obstaclesGroup[0].children);
+            console.log(intersects);
+            //console.log(sceneElements.obstaclesGroup);
+            //console.log(intersects);
+            if (intersects.length > 0) {
+                //console.log(intersects);
+                //console.log(bird.raycast(raycaster, intersects));
+    }
+        }
+    }
+    
+    
+    
 }
 
 // Create and insert in the scene graph the models of the 3D scene
@@ -153,6 +178,9 @@ function load3DObjects(sceneGraph) {
 
     // Initialize values of the center of each obstacle's hole
     sceneElements.centerPositionValues = [];
+
+    // Initialize array that will store each obstacle
+    sceneElements.obstaclesGroup = [];
 }
 
 // Displacement value
@@ -169,7 +197,24 @@ var times = 0;
 
 var obstaclePosition = sceneElements.camera.position.z - 100;
 
+var obstacleID = 1;
+
+function removePreviousObstacles() {
+    var bird = sceneElements.sceneGraph.getObjectByName("bird");
+    for (var i=0; i<sceneElements.obstaclesGroup.length; i++) {
+        var oldObstacle = sceneElements.obstaclesGroup[0];
+        if (Math.abs(bird.position.z - oldObstacle.position.z) > 200) {
+            console.log(oldObstacle);
+            sceneElements.sceneGraph.remove(oldObstacle);
+            sceneElements.obstaclesGroup.splice(oldObstacle, 1); 
+        }
+    }
+}
 function computeFrame(time) {
+
+    //birdIntersectsObstacle();
+    removePreviousObstacles();
+
     sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
 
@@ -192,19 +237,17 @@ function computeFrame(time) {
     sceneElements.centerPositionValues.push(centerPosition);
     var obstacle = createObstacle(centerPosition, 10);
     obstacle.position.z = obstaclePosition;
-    if (obstacle.position.z < 0) {
-        console.log(obstacle.position.z);
-    }
-    
     obstaclePosition -= 50;
     sceneElements.sceneGraph.add(obstacle);
+    obstacle.name = obstacleID;
+    obstacleID += 1;
     
     // Position-y of bird increases when pressing space
     
     if (space) {
         var initialPosition = bird.position.y;
         if (sceneElements.birdInitialPosition.length > 0 && birdFlag) {
-            if (Math.abs(sceneElements.birdInitialPosition[0] - initialPosition) >= 6) {
+            if (Math.abs(sceneElements.birdInitialPosition[0] - initialPosition) >= 10) {
                 //deltaBirdY *= -1; 
                 sceneElements.birdInitialPosition = [];
                 birdFlag = false;
@@ -226,6 +269,8 @@ function computeFrame(time) {
         birdFlag = true;
         //console.log(birdFlag);
     }
+
+    
 
     // Rendering
     helper.render(sceneElements);
