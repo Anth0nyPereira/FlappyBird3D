@@ -52,7 +52,7 @@ function onDocumentKeyUp(event) {
     }
 }
 
-function createStar(height) {
+function createStar(height, withLines) { // added a new argument so that I can reuse this function to make the little rocket's stars
     var star = new THREE.Group();
 
     var radiusTop = 4;  
@@ -64,15 +64,18 @@ function createStar(height) {
     var star2 = new THREE.Mesh(geometry, material);
     star2.rotation.y = Math.PI;
 
-    var line1 = addLineSegment(geometry, 0xfe1493);
-    var line2 = addLineSegment(geometry, 0xfe1493);
-    line2.rotation.y = Math.PI;
-
     star.add(star1);
     star.add(star2);
 
-    star.add(line1);
-    star.add(line2);
+    if (withLines) {
+        var line1 = addLineSegment(geometry, 0xfe1493);
+        var line2 = addLineSegment(geometry, 0xfe1493);
+        line2.rotation.y = Math.PI;
+
+        star.add(line1);
+        star.add(line2);
+    }
+    
     return star;
 }
 
@@ -132,6 +135,18 @@ function createRing() {
     return mesh;
 }
 
+function createWindowStars() {
+    var stars = new THREE.Group();
+    for (var i = 0; i < 8; i++) {
+        var star = createStar(0.05, false);
+        star.scale.set(0.05, 0.05, 0.05);
+        star.position.set(1.35*Math.cos(i*Math.PI/4), 1.35*Math.sin(i*Math.PI/4), 0);
+        star.rotation.x = Math.PI/2;
+        stars.add(star);
+    }
+    return stars;
+}
+
 function createRocketWindow() {
     var window = new THREE.Group();
 
@@ -141,8 +156,13 @@ function createRocketWindow() {
     // ring around the glass
     var ring = createRing();
 
+    // stars
+    var stars = createWindowStars();
+    stars.position.set(0, 0.1, 0.5);
+
     window.add(glass);
     window.add(ring);
+    window.add(stars);
 
     return window;
     
