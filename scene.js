@@ -121,28 +121,6 @@ function randomIntFromInterval(min, max) { // min and max included
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-function birdIntersectsObstacle() {
-    var bird = sceneElements.sceneGraph.getObjectByName("bird");
-    var raycaster = new THREE.Raycaster();
-    raycaster.set(new THREE.Vector3(bird.position.x, bird.position.y, bird.position.z), new THREE.Vector3(-1, 0, 0));
-    if (sceneElements.obstaclesGroup.length > 0) {
-        for (var i=parseInt(sceneElements.obstaclesGroup[0].name); i<parseInt(sceneElements.obstaclesGroup[sceneElements.obstaclesGroup.length - 1].name); i++) {
-            console.log(sceneElements.obstaclesGroup[i]);
-            var intersects = raycaster.intersectObjects(sceneElements.obstaclesGroup[0].children);
-            console.log(intersects);
-            //console.log(sceneElements.obstaclesGroup);
-            //console.log(intersects);
-            if (intersects.length > 0) {
-                //console.log(intersects);
-                //console.log(bird.raycast(raycaster, intersects));
-    }
-        }
-    }
-    
-    
-    
-}
-
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
@@ -199,12 +177,28 @@ var obstaclePosition = sceneElements.camera.position.z - 100;
 
 var obstacleID = 1;
 
+var gameOver = true;
+function birdIntersectsObstacle() {
+    var bird = sceneElements.sceneGraph.getObjectByName("bird");
+    var raycaster = new THREE.Raycaster();
+    raycaster.set(new THREE.Vector3(bird.position.x, bird.position.y, bird.position.z), new THREE.Vector3(-1, 0, 0));
+    if (sceneElements.obstaclesGroup.length > 0) {
+        for (var i=parseInt(sceneElements.obstaclesGroup[0].name); i<parseInt(sceneElements.obstaclesGroup[sceneElements.obstaclesGroup.length - 1].name); i++) {
+            var intersects = raycaster.intersectObjects(sceneElements.obstaclesGroup[0].children, true); // true -> means recursively checking its children
+            if (intersects.length > 0 && gameOver) {
+                alert("GAME OVER!");
+                gameOver = false;
+            }
+        }
+    }  
+}
+
 function removePreviousObstacles() {
     var bird = sceneElements.sceneGraph.getObjectByName("bird");
     for (var i=0; i<sceneElements.obstaclesGroup.length; i++) {
         var oldObstacle = sceneElements.obstaclesGroup[0];
         if (Math.abs(bird.position.z - oldObstacle.position.z) > 200) {
-            console.log(oldObstacle);
+            //console.log(oldObstacle);
             sceneElements.sceneGraph.remove(oldObstacle);
             sceneElements.obstaclesGroup.splice(oldObstacle, 1); 
         }
@@ -212,7 +206,7 @@ function removePreviousObstacles() {
 }
 function computeFrame(time) {
 
-    //birdIntersectsObstacle();
+    birdIntersectsObstacle();
     removePreviousObstacles();
 
     sceneElements.camera.position.z -= 0.5;
