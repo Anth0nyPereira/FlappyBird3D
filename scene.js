@@ -147,6 +147,23 @@ function createWindowStars() {
     return stars;
 }
 
+function createRocketWing() {
+    var shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.bezierCurveTo(0.5, 2, 0, 0, -1, 6);
+    shape.bezierCurveTo(-1.5, 4, -3, 7, -4, 8);
+    shape.lineTo(-4, 4);
+    shape.lineTo(0, 0);
+
+    var extrudeSettings = {steps: 2, depth: 0.3, bevelEnabled: false, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
+
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var material = new THREE.MeshBasicMaterial({color: 0xff0000});
+    var mesh = new THREE.Mesh(geometry, material);  
+    mesh.scale.set(0.7, 0.7, 0.7);  
+    return mesh;
+}
+
 function createRocketWindow() {
     var window = new THREE.Group();
 
@@ -179,9 +196,18 @@ function createRocket() {
     var window = createRocketWindow();
     window.position.set(0, 5, 1);
 
+    var wing1 = createRocketWing();
+    wing1.position.set(3.8, -2, -2);
+
+    var wing2 = createRocketWing();
+    wing2.rotation.y = Math.PI;
+    wing2.position.set(-3.8, -2, -2);
+
     rocket.add(head);
     rocket.add(tail);
     rocket.add(window);
+    rocket.add(wing1);
+    rocket.add(wing2);
 
     return rocket;
 }
