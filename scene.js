@@ -113,6 +113,41 @@ function createRocketTail() {
     return mesh;
 }
 
+function createGlass() {
+    var radius =  1, segments = 100;  
+    var geometry = new THREE.CircleGeometry(radius, segments);
+    var material = new THREE.MeshBasicMaterial({color: 0x0096ff});
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.scale.set(1.4, 1.4, 1.4);
+    return mesh;
+}
+
+function createRing() {
+    var radius =  1.5, tubeRadius =  0.3, radialSegments =  5, tubularSegments =  100;  
+
+    var geometry = new THREE.TorusGeometry(radius, tubeRadius, radialSegments, tubularSegments);
+    var material = new THREE.MeshBasicMaterial({color: 0xff0000});
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.scale.set(0.9, 0.9, 0.9);
+    return mesh;
+}
+
+function createRocketWindow() {
+    var window = new THREE.Group();
+
+    // glass
+    var glass = createGlass();
+
+    // ring around the glass
+    var ring = createRing();
+
+    window.add(glass);
+    window.add(ring);
+
+    return window;
+    
+}
+
 function createRocket() {
     var rocket = new THREE.Group();
     var head = createRocketHead();
@@ -121,8 +156,13 @@ function createRocket() {
     var tail = createRocketTail();
     tail.position.y = 7.5;
 
+    var window = createRocketWindow();
+    window.position.set(0, 5, 1);
+
     rocket.add(head);
     rocket.add(tail);
+    rocket.add(window);
+
     return rocket;
 }
 
