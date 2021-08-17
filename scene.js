@@ -92,7 +92,7 @@ function createBird() {
     return mesh;
 }
 
-function createRocketEdge() {
+function createRocketHead() {
     var points = [];
     for (var i = 0; i < 5; i+=0.2) {
         points.push(new THREE.Vector2(i, Math.pow(i, 2)/5));
@@ -101,6 +101,14 @@ function createRocketEdge() {
     var material = new THREE.MeshBasicMaterial({color: 0xff0000});
     var mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.x = Math.PI;
+    return mesh;
+}
+
+function createRocketTail() {
+    var radiusTop =  3.2, radiusBottom =  1.4, height = 8, radialSegments = 12;  
+    var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments);
+    var material = new THREE.MeshBasicMaterial({color: 0xffffff});
+    var mesh = new THREE.Mesh(geometry, material);
     return mesh;
 }
 
@@ -166,9 +174,13 @@ function load3DObjects(sceneGraph) {
 
     // FOR TESTING PURPOSES
     // create rocket edge
-    var rocketEdge = createRocketEdge();
+    var rocketEdge = createRocketHead();
     rocketEdge.position.set(0, sceneElements.camera.getWorldPosition(target).y, sceneElements.camera.getWorldPosition(target).z);
     sceneElements.sceneGraph.add(rocketEdge);
+
+    var rocketTail = createRocketTail();
+    rocketTail.position.set(0, sceneElements.camera.getWorldPosition(target).y - 10, sceneElements.camera.getWorldPosition(target).z);
+    sceneElements.sceneGraph.add(rocketTail);
 
 
     //var obstacle1 = createObstacle(40, 20);
