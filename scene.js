@@ -92,6 +92,22 @@ function createBird() {
     return mesh;
 }
 
+function createRocketEdge() {
+    var points = [];
+    for (var i = 0; i < 5; i+=0.2) {
+        points.push(new THREE.Vector2(i, Math.pow(i, 2)/5));
+    }
+    var geometry = new THREE.LatheGeometry(points);
+    var material = new THREE.MeshBasicMaterial({color: 0xff0000});
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.x = Math.PI;
+    return mesh;
+}
+
+function createRocket() {
+    
+}
+
 // function that will return an obstacle already made of 2 stars that only has the centering position and the height of the hole between the two poles
 function createObstacle(centerPosition, holeHeight) {
 
@@ -147,6 +163,13 @@ function load3DObjects(sceneGraph) {
     bird.position.set(0, sceneElements.camera.getWorldPosition(target).y, sceneElements.camera.getWorldPosition(target).z);
     bird.name = "bird";
     sceneElements.sceneGraph.add(bird);
+
+    // FOR TESTING PURPOSES
+    // create rocket edge
+    var rocketEdge = createRocketEdge();
+    rocketEdge.position.set(0, sceneElements.camera.getWorldPosition(target).y, sceneElements.camera.getWorldPosition(target).z);
+    sceneElements.sceneGraph.add(rocketEdge);
+
 
     //var obstacle1 = createObstacle(40, 20);
     //sceneElements.sceneGraph.add(obstacle1);
@@ -209,7 +232,7 @@ function computeFrame(time) {
     birdIntersectsObstacle();
     removePreviousObstacles();
 
-    sceneElements.camera.position.z -= 0.5;
+    //sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
 
     var bird = sceneElements.sceneGraph.getObjectByName("bird");
