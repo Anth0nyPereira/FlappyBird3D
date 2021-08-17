@@ -93,19 +93,27 @@ function createBird() {
 }
 
 function createRocketHead() {
-    var points = [];
-    for (var i = 0; i < 5; i+=0.2) {
-        points.push(new THREE.Vector2(i, Math.pow(i, 2)/5));
-    }
-    var geometry = new THREE.LatheGeometry(points);
+    var radius = 3, height = 3, radialSegments = 32;  
+    var geometry = new THREE.ConeGeometry(radius, height, radialSegments);
     var material = new THREE.MeshBasicMaterial({color: 0xff0000});
     var mesh = new THREE.Mesh(geometry, material);
-    mesh.rotation.x = Math.PI;
+    return mesh;
+}
+
+function createRocketMiddle() {
+    var points = [];
+    for (var i = 5; i < 20; i+=0.1) {
+        points.push(new THREE.Vector2(i, 0.1*Math.pow(i, 2)));
+    }
+    var geometry = new THREE.LatheGeometry(points);
+    var material = new THREE.MeshBasicMaterial({color: 0xffffff});
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.scale.set(0.3, 0.3, 0.3);
     return mesh;
 }
 
 function createRocketTail() {
-    var radiusTop =  3.2, radiusBottom =  1.4, height = 8, radialSegments = 12;  
+    var radiusTop =  3, radiusBottom =  1.4, height = 8, radialSegments = 12;  
     var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments);
     var material = new THREE.MeshBasicMaterial({color: 0xffffff});
     var mesh = new THREE.Mesh(geometry, material);
@@ -113,7 +121,16 @@ function createRocketTail() {
 }
 
 function createRocket() {
-    
+    var rocket = new THREE.Group();
+    var head = createRocketHead();
+    head.position.y = 10.5;
+
+    var tail = createRocketTail();
+    tail.position.y = 5;
+
+    rocket.add(head);
+    rocket.add(tail);
+    return rocket;
 }
 
 // function that will return an obstacle already made of 2 stars that only has the centering position and the height of the hole between the two poles
@@ -174,14 +191,9 @@ function load3DObjects(sceneGraph) {
 
     // FOR TESTING PURPOSES
     // create rocket edge
-    var rocketEdge = createRocketHead();
-    rocketEdge.position.set(0, sceneElements.camera.getWorldPosition(target).y, sceneElements.camera.getWorldPosition(target).z);
-    sceneElements.sceneGraph.add(rocketEdge);
-
-    var rocketTail = createRocketTail();
-    rocketTail.position.set(0, sceneElements.camera.getWorldPosition(target).y - 10, sceneElements.camera.getWorldPosition(target).z);
-    sceneElements.sceneGraph.add(rocketTail);
-
+    var rocket = createRocket();
+    rocket.position.set(0, sceneElements.camera.getWorldPosition(target).y, sceneElements.camera.getWorldPosition(target).z);
+    sceneElements.sceneGraph.add(rocket);
 
     //var obstacle1 = createObstacle(40, 20);
     //sceneElements.sceneGraph.add(obstacle1);
