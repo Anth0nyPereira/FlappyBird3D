@@ -112,10 +112,18 @@ function createRocketMiddle() {
 }
 
 function createRocketTail() {
-    var radiusTop =  3, radiusBottom =  1.4, height = 8, radialSegments = 12;  
-    var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments);
+    var shape = new THREE.Shape();
+    shape.moveTo(2, 0);
+    shape.bezierCurveTo(3, -3, 2, -5, 1, -8);
+    shape.lineTo(-1, -8);
+    shape.bezierCurveTo(-2, -5, -3, -3, -2, 0);
+    shape.lineTo(2, 0);
+
+    var extrudeSettings = {steps: 2, depth: 0.2, bevelEnabled: true, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
+
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     var material = new THREE.MeshBasicMaterial({color: 0xffffff});
-    var mesh = new THREE.Mesh(geometry, material);
+    var mesh = new THREE.Mesh(geometry, material);    
     return mesh;
 }
 
