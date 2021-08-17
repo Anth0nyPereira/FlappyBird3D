@@ -82,32 +82,18 @@ function addLineSegment(geometry, color) {
     var line = new THREE.LineSegments(edgesGeometry, material);
     return line;
 }
-
 function createRocketHead() {
     var shape = new THREE.Shape();
-    shape.moveTo(2, 0);
-    shape.bezierCurveTo(1.5, 1, 2.5, 2, 0, 3);
-    shape.bezierCurveTo(-2.5, 2, -1.5, 1, -2, 0);
+    shape.moveTo(0, 3);
     shape.lineTo(2, 0);
+    shape.lineTo(-2, 0);
+    shape.lineTo(0, 3);
 
-    var extrudeSettings = {steps: 2, depth: 0.2, bevelEnabled: true, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
+    var extrudeSettings = {steps: 2, depth: 0.1, bevelEnabled: false, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
 
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     var material = new THREE.MeshBasicMaterial({color: 0xff0000});
-    var mesh = new THREE.Mesh(geometry, material);    
-    mesh.scale.y = 1.3;
-    return mesh;
-}
-
-function createRocketMiddle() {
-    var points = [];
-    for (var i = 5; i < 20; i+=0.1) {
-        points.push(new THREE.Vector2(i, 0.1*Math.pow(i, 2)));
-    }
-    var geometry = new THREE.LatheGeometry(points);
-    var material = new THREE.MeshBasicMaterial({color: 0xffffff});
-    var mesh = new THREE.Mesh(geometry, material);
-    mesh.scale.set(0.3, 0.3, 0.3);
+    var mesh = new THREE.Mesh(geometry, material); 
     return mesh;
 }
 
@@ -119,7 +105,7 @@ function createRocketTail() {
     shape.bezierCurveTo(-2, -5, -3, -3, -2, 0);
     shape.lineTo(2, 0);
 
-    var extrudeSettings = {steps: 2, depth: 0.2, bevelEnabled: true, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
+    var extrudeSettings = {steps: 2, depth: 0.3, bevelEnabled: false, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
 
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     var material = new THREE.MeshBasicMaterial({color: 0xffffff});
@@ -130,10 +116,10 @@ function createRocketTail() {
 function createRocket() {
     var rocket = new THREE.Group();
     var head = createRocketHead();
-    head.position.y = 10.5;
+    head.position.y = 7.5;
 
     var tail = createRocketTail();
-    tail.position.y = 5;
+    tail.position.y = 7.5;
 
     rocket.add(head);
     rocket.add(tail);
