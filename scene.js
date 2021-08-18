@@ -287,6 +287,7 @@ function load3DObjects(sceneGraph) {
     // create rocket edge
     var rocket = createRocket();
     rocket.position.set(0, sceneElements.camera.position.y, sceneElements.camera.position.z);
+    rocket.rotation.z = -Math.PI/2;
     sceneElements.sceneGraph.add(rocket);
 
     //var obstacle1 = createObstacle(40, 20);
@@ -322,8 +323,7 @@ var gameOver = true;
 
 var scaleCounter = 0;
 
-function computeFrame(time) {
-
+function animateRocketFire() {
     var fire = sceneElements.sceneGraph.getObjectByName("fire");
     var scaleCounterString = scaleCounter.toString();
     var lastDigitString = scaleCounterString[scaleCounterString.length - 1];
@@ -335,7 +335,11 @@ function computeFrame(time) {
         fire.scale.set(0.2, 0.6, 0.2);
     }
     scaleCounter++;
+}
 
+function computeFrame(time) {
+    animateRocketFire();
+    
     // Rendering
     helper.render(sceneElements);
 
