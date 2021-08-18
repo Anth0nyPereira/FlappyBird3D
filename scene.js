@@ -185,6 +185,15 @@ function createRocketWindow() {
     
 }
 
+function createRocketTube() {
+    var radius =  0.2, tubeRadius =  0.5, radialSegments = 8, tubularSegments = 100, p =  1, q = 20;  
+
+    var geometry = new THREE.TorusKnotGeometry(radius, tubeRadius, tubularSegments, radialSegments, p, q);
+    var material = new THREE.MeshBasicMaterial({color: 0x606060});
+    var mesh = new THREE.Mesh(geometry, material);
+    return mesh;
+}
+
 function createRocket() {
     var rocket = new THREE.Group();
     var head = createRocketHead();
@@ -203,11 +212,16 @@ function createRocket() {
     wing2.rotation.y = Math.PI;
     wing2.position.set(-3.8, -2, -2);
 
+    var tube = createRocketTube();
+    tube.rotation.x = Math.PI/2;
+    tube.position.y = -1;
+
     rocket.add(head);
     rocket.add(tail);
     rocket.add(window);
     rocket.add(wing1);
     rocket.add(wing2);
+    rocket.add(tube);
 
     return rocket;
 }
