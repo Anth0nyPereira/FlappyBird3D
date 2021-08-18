@@ -38,6 +38,10 @@ const helper = {
 
         // Control for the camera
         sceneElements.control = new THREE.OrbitControls(camera, renderer.domElement);
+        sceneElements.control.screenSpacePanning = true;
+        sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
+
+
     },
 
     render: function render(sceneElements) {
