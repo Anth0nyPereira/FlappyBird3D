@@ -6,7 +6,7 @@ const sceneElements = {
     camera: null,
     control: null,  
     renderer: null,
-    birdInitialPosition: null,
+    rocketInitialPosition: null,
     centerPositionValues: null,
     obstaclesGroup: null,
 };
@@ -84,15 +84,6 @@ function addLineSegment(geometry, color) {
     var material = new THREE.LineBasicMaterial({color: color, linewidth: 50});
     var line = new THREE.LineSegments(edgesGeometry, material);
     return line;
-}
-
-function createBird() {
-    var radius = 2;  
-    var detail = 5;  
-    var geometry = new THREE.TetrahedronGeometry(radius, detail);
-    var material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-    var mesh = new THREE.Mesh(geometry, material);
-    return mesh;
 }
 
 // function that will return an obstacle already made of 2 stars that only has the centering position and the height of the hole between the two poles
@@ -317,25 +308,19 @@ function load3DObjects(sceneGraph) {
     // Set shadow property
     planeObject.receiveShadow = true;
 
-    // Create bird
-    var bird = createBird();
-    var target = new THREE.Vector3();
-    bird.position.set(0, sceneElements.camera.getWorldPosition(target).y, sceneElements.camera.getWorldPosition(target).z);
-    bird.name = "bird";
-    sceneElements.sceneGraph.add(bird);
-
     // FOR TESTING PURPOSES
     var rocket = createRocket();
     rocket.position.set(0, sceneElements.camera.position.y, sceneElements.camera.position.z);
     rocket.rotation.y = Math.PI/2;
     rocket.rotation.z = -Math.PI/2;
     sceneElements.sceneGraph.add(rocket);
+    rocket.name = "rocket";
 
     //var obstacle1 = createObstacle(40, 20);
     //sceneElements.sceneGraph.add(obstacle1);
 
-    // Initialize bird initial position array
-    sceneElements.birdInitialPosition = [];
+    // Initialize rocket initial position array
+    sceneElements.rocketInitialPosition = [];
 
     // Initialize values of the center of each obstacle's hole
     sceneElements.centerPositionValues = [];
@@ -350,9 +335,9 @@ var delta = 0.1;
 
 var dispX = 0.2, dispZ = 0.2;
 
-var deltaBirdY = 0.2;
+var deltaRocketY = 0.2;
 
-var birdFlag = true;
+var rocketFlag = true;
 
 var times = 0;
 
@@ -361,10 +346,10 @@ var obstaclePosition = sceneElements.camera.position.z - 100;
 var obstacleID = 1;
 
 var gameOver = true;
-function birdIntersectsObstacle() {
-    var bird = sceneElements.sceneGraph.getObjectByName("bird");
+function rocketIntersectsObstacle() {
+    var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
     var raycaster = new THREE.Raycaster();
-    raycaster.set(new THREE.Vector3(bird.position.x, bird.position.y, bird.position.z), new THREE.Vector3(-1, 0, 0));
+    raycaster.set(new THREE.Vector3(rocket.position.x, rocket.position.y, rocket.position.z), new THREE.Vector3(-1, 0, 0));
     if (sceneElements.obstaclesGroup.length > 0) {
         for (var i=parseInt(sceneElements.obstaclesGroup[0].name); i<parseInt(sceneElements.obstaclesGroup[sceneElements.obstaclesGroup.length - 1].name); i++) {
             var intersects = raycaster.intersectObjects(sceneElements.obstaclesGroup[0].children, true); // true -> means recursively checking its children
@@ -377,10 +362,10 @@ function birdIntersectsObstacle() {
 }
 
 function removePreviousObstacles() {
-    var bird = sceneElements.sceneGraph.getObjectByName("bird");
+    var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
     for (var i=0; i<sceneElements.obstaclesGroup.length; i++) {
         var oldObstacle = sceneElements.obstaclesGroup[0];
-        if (Math.abs(bird.position.z - oldObstacle.position.z) > 200) {
+        if (Math.abs(rocket.position.z - oldObstacle.position.z) > 200) {
             //console.log(oldObstacle);
             sceneElements.sceneGraph.remove(oldObstacle);
             sceneElements.obstaclesGroup.splice(oldObstacle, 1); 
@@ -395,7 +380,6 @@ function animateRocketFire() {
     var scaleCounterString = scaleCounter.toString();
     var lastDigitString = scaleCounterString[scaleCounterString.length - 1];
     var lastDigit = parseInt(lastDigitString); // between 0 and 9
-    console.log(lastDigit);
     if (lastDigit > 5) {
         fire.scale.set(0.25, 0.8, 0.25);
     } else {
@@ -406,15 +390,15 @@ function animateRocketFire() {
 
 function computeFrame(time) {
 
-    birdIntersectsObstacle();
+    rocketIntersectsObstacle();
     removePreviousObstacles();
     animateRocketFire();
 
-    //sceneElements.camera.position.z -= 0.5;
+    sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
 
-    var bird = sceneElements.sceneGraph.getObjectByName("bird");
-    bird.position.z -= 0.5;
+    var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
+    rocket.position.z -= 0.5;
     
     var target = new THREE.Vector3();
     /*
@@ -437,32 +421,32 @@ function computeFrame(time) {
     obstacle.name = obstacleID;
     obstacleID += 1;
     
-    // Position-y of bird increases when pressing space
+    // Position-y of rocket increases when pressing space
     
     if (space) {
-        var initialPosition = bird.position.y;
-        if (sceneElements.birdInitialPosition.length > 0 && birdFlag) {
-            if (Math.abs(sceneElements.birdInitialPosition[0] - initialPosition) >= 10) {
-                //deltaBirdY *= -1; 
-                sceneElements.birdInitialPosition = [];
-                birdFlag = false;
-                //console.log(birdFlag);
+        var initialPosition = rocket.position.y;
+        if (sceneElements.rocketInitialPosition.length > 0 && rocketFlag) {
+            if (Math.abs(sceneElements.rocketInitialPosition[0] - initialPosition) >= 10) {
+                //deltarocketY *= -1; 
+                sceneElements.rocketInitialPosition = [];
+                rocketFlag = false;
+                //console.log(rocketFlag);
             }
         }
 
-        if (birdFlag) {
-            sceneElements.birdInitialPosition.push(initialPosition);
-            //console.log(sceneElements.birdInitialPosition);
-            bird.position.y += 6*deltaBirdY;
-        } else if (!birdFlag) {
-            bird.position.y -= 3*deltaBirdY;
+        if (rocketFlag) {
+            sceneElements.rocketInitialPosition.push(initialPosition);
+            //console.log(sceneElements.rocketInitialPosition);
+            rocket.position.y += 6*deltaRocketY;
+        } else if (!rocketFlag) {
+            rocket.position.y -= 3*deltaRocketY;
         }
         
 
     } else if (!space) {
-        bird.position.y -= 3*deltaBirdY;
-        birdFlag = true;
-        //console.log(birdFlag);
+        rocket.position.y -= 3*deltaRocketY;
+        rocketFlag = true;
+        //console.log(rocketFlag);
     }
 
     
