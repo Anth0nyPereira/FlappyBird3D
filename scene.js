@@ -52,7 +52,7 @@ function onDocumentKeyUp(event) {
     }
 }
 
-function createStar(height) {
+function createStar(height, withLines) { // added a new argument so that I can reuse this function to make the little rocket's stars
     var star = new THREE.Group();
 
     var radiusTop = 4;  
@@ -64,15 +64,18 @@ function createStar(height) {
     var star2 = new THREE.Mesh(geometry, material);
     star2.rotation.y = Math.PI;
 
-    var line1 = addLineSegment(geometry, 0xfe1493);
-    var line2 = addLineSegment(geometry, 0xfe1493);
-    line2.rotation.y = Math.PI;
-
     star.add(star1);
     star.add(star2);
 
-    star.add(line1);
-    star.add(line2);
+    if (withLines) {
+        var line1 = addLineSegment(geometry, 0xfe1493);
+        var line2 = addLineSegment(geometry, 0xfe1493);
+        line2.rotation.y = Math.PI;
+
+        star.add(line1);
+        star.add(line2);
+    }
+    
     return star;
 }
 
@@ -92,47 +95,6 @@ function createBird() {
     return mesh;
 }
 
-function createRocketHead() {
-    var radius = 3, height = 3, radialSegments = 32;  
-    var geometry = new THREE.ConeGeometry(radius, height, radialSegments);
-    var material = new THREE.MeshBasicMaterial({color: 0xff0000});
-    var mesh = new THREE.Mesh(geometry, material);
-    return mesh;
-}
-
-function createRocketMiddle() {
-    var points = [];
-    for (var i = 5; i < 20; i+=0.1) {
-        points.push(new THREE.Vector2(i, 0.1*Math.pow(i, 2)));
-    }
-    var geometry = new THREE.LatheGeometry(points);
-    var material = new THREE.MeshBasicMaterial({color: 0xffffff});
-    var mesh = new THREE.Mesh(geometry, material);
-    mesh.scale.set(0.3, 0.3, 0.3);
-    return mesh;
-}
-
-function createRocketTail() {
-    var radiusTop =  3, radiusBottom =  1.4, height = 8, radialSegments = 12;  
-    var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments);
-    var material = new THREE.MeshBasicMaterial({color: 0xffffff});
-    var mesh = new THREE.Mesh(geometry, material);
-    return mesh;
-}
-
-function createRocket() {
-    var rocket = new THREE.Group();
-    var head = createRocketHead();
-    head.position.y = 10.5;
-
-    var tail = createRocketTail();
-    tail.position.y = 5;
-
-    rocket.add(head);
-    rocket.add(tail);
-    return rocket;
-}
-
 // function that will return an obstacle already made of 2 stars that only has the centering position and the height of the hole between the two poles
 function createObstacle(centerPosition, holeHeight) {
 
@@ -140,14 +102,14 @@ function createObstacle(centerPosition, holeHeight) {
     
     // first, let's create the star at the bottom
     var star1Height = centerPosition - holeHeight/2;
-    var star1 = createStar(star1Height);
+    var star1 = createStar(star1Height, true);
     star1.position.y = star1Height/2;
 
     // now, the second star at the top
     // let's define a maximum value for the height of an obstacle (conjunction of two stars) --> 500 of height
 
     var star2Height = 500 - holeHeight - star1Height;
-    var star2 = createStar(star2Height);
+    var star2 = createStar(star2Height, true);
     star2.position.y = star2Height/2 + holeHeight + star1Height;
 
     obstacle.add(star1);
@@ -155,6 +117,179 @@ function createObstacle(centerPosition, holeHeight) {
 
     sceneElements.obstaclesGroup.push(obstacle);
     return obstacle;
+}
+
+function createRocketHead() {
+    var shape = new THREE.Shape();
+    shape.moveTo(0, 3);
+    shape.lineTo(2, 0);
+    shape.lineTo(-2, 0);
+    shape.lineTo(0, 3);
+
+    var extrudeSettings = {steps: 2, depth: 0.1, bevelEnabled: false, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
+
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var material = new THREE.MeshBasicMaterial({color: 0xff0000});
+    var mesh = new THREE.Mesh(geometry, material); 
+    return mesh;
+}
+
+function createRocketTail() {
+    var shape = new THREE.Shape();
+    shape.moveTo(2, 0);
+    shape.bezierCurveTo(3, -3, 2, -5, 1, -8);
+    shape.lineTo(-1, -8);
+    shape.bezierCurveTo(-2, -5, -3, -3, -2, 0);
+    shape.lineTo(2, 0);
+
+    var extrudeSettings = {steps: 2, depth: 0.3, bevelEnabled: false, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
+
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var material = new THREE.MeshBasicMaterial({color: 0xffffff});
+    var mesh = new THREE.Mesh(geometry, material);    
+    return mesh;
+}
+
+function createGlass() {
+    var radius =  1, segments = 100;  
+    var geometry = new THREE.CircleGeometry(radius, segments);
+    var material = new THREE.MeshBasicMaterial({color: 0x0096ff});
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.scale.set(1.4, 1.4, 1.4);
+    return mesh;
+}
+
+function createRing() {
+    var radius =  1.5, tubeRadius =  0.3, radialSegments =  5, tubularSegments =  100;  
+
+    var geometry = new THREE.TorusGeometry(radius, tubeRadius, radialSegments, tubularSegments);
+    var material = new THREE.MeshBasicMaterial({color: 0xff0000});
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.scale.set(0.9, 0.9, 0.9);
+    return mesh;
+}
+
+function createWindowStars() {
+    var stars = new THREE.Group();
+    for (var i = 0; i < 8; i++) {
+        var star = createStar(0.05, false);
+        star.scale.set(0.05, 0.05, 0.05);
+        star.position.set(1.35*Math.cos(i*Math.PI/4), 1.35*Math.sin(i*Math.PI/4), 0);
+        star.rotation.x = Math.PI/2;
+        stars.add(star);
+    }
+    return stars;
+}
+
+function createRocketWing() {
+    var shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.bezierCurveTo(0.5, 2, 0, 0, -1, 6);
+    shape.bezierCurveTo(-1.5, 4, -3, 7, -4, 8);
+    shape.lineTo(-4, 4);
+    shape.lineTo(0, 0);
+
+    var extrudeSettings = {steps: 2, depth: 0.3, bevelEnabled: false, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
+
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var material = new THREE.MeshBasicMaterial({color: 0xff0000});
+    var mesh = new THREE.Mesh(geometry, material);  
+    mesh.scale.set(0.7, 0.7, 0.7);  
+    return mesh;
+}
+
+function createRocketWindow() {
+    var window = new THREE.Group();
+
+    // glass
+    var glass = createGlass();
+
+    // ring around the glass
+    var ring = createRing();
+
+    // stars
+    var stars = createWindowStars();
+    stars.position.set(0, 0.1, 0.5);
+
+    window.add(glass);
+    window.add(ring);
+    window.add(stars);
+
+    return window;
+    
+}
+
+function createRocketTube() {
+    var radius =  0.4, tubeRadius =  0.5, radialSegments = 8, tubularSegments = 100, p =  1, q = 20;  
+
+    var geometry = new THREE.TorusKnotGeometry(radius, tubeRadius, tubularSegments, radialSegments, p, q);
+    var material = new THREE.MeshBasicMaterial({color: 0x606060});
+    var mesh = new THREE.Mesh(geometry, material);
+    return mesh;
+}
+
+function createRocketFire() {
+    var group = new THREE.Group();
+
+    var shape = new THREE.Shape();
+    shape.moveTo(4, 0);
+    shape.bezierCurveTo(5, -2, 3, -5, 0, -8);
+    shape.bezierCurveTo(-3, -5, -5, -2, -4, 0);
+    shape.lineTo(4, 0);
+
+    var extrudeSettings = {steps: 2, depth: 0.3, bevelEnabled: false, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
+
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var outsideMaterial = new THREE.MeshBasicMaterial({color: 0xf28c28});
+    var outsideMesh = new THREE.Mesh(geometry, outsideMaterial);
+
+    var insideMaterial = new THREE.MeshBasicMaterial({color: 0xffd700});
+    var insideMesh = new THREE.Mesh(geometry, insideMaterial);
+
+    insideMesh.scale.set(0.7, 0.7, 0.7);
+    insideMesh.position.set(0, 0.1, 0.5);
+
+    group.add(outsideMesh);
+    group.add(insideMesh);
+    return group;
+}
+
+function createRocket() {
+    var rocket = new THREE.Group();
+    var head = createRocketHead();
+    head.position.y = 7.5;
+
+    var tail = createRocketTail();
+    tail.position.y = 7.5;
+
+    var window = createRocketWindow();
+    window.position.set(0, 5, 1);
+
+    var wing1 = createRocketWing();
+    wing1.position.set(3.8, -2, -2);
+
+    var wing2 = createRocketWing();
+    wing2.rotation.y = Math.PI;
+    wing2.position.set(-3.8, -2, -2);
+
+    var tube = createRocketTube();
+    tube.rotation.x = Math.PI/2;
+    tube.position.y = -1.2;
+
+    var fire = createRocketFire();
+    fire.scale.set(0.2, 0.6, 0.2);
+    fire.position.y = -1.8;
+    fire.name = "fire";
+
+    rocket.add(head);
+    rocket.add(tail);
+    rocket.add(window);
+    rocket.add(wing1);
+    rocket.add(wing2);
+    rocket.add(tube);
+    rocket.add(fire);
+
+    return rocket;
 }
 
 // function to return a random integer between two values
@@ -190,9 +325,10 @@ function load3DObjects(sceneGraph) {
     sceneElements.sceneGraph.add(bird);
 
     // FOR TESTING PURPOSES
-    // create rocket edge
     var rocket = createRocket();
-    rocket.position.set(0, sceneElements.camera.getWorldPosition(target).y, sceneElements.camera.getWorldPosition(target).z);
+    rocket.position.set(0, sceneElements.camera.position.y, sceneElements.camera.position.z);
+    rocket.rotation.y = Math.PI/2;
+    rocket.rotation.z = -Math.PI/2;
     sceneElements.sceneGraph.add(rocket);
 
     //var obstacle1 = createObstacle(40, 20);
@@ -251,10 +387,28 @@ function removePreviousObstacles() {
         }
     }
 }
+
+var scaleCounter = 0;
+
+function animateRocketFire() {
+    var fire = sceneElements.sceneGraph.getObjectByName("fire");
+    var scaleCounterString = scaleCounter.toString();
+    var lastDigitString = scaleCounterString[scaleCounterString.length - 1];
+    var lastDigit = parseInt(lastDigitString); // between 0 and 9
+    console.log(lastDigit);
+    if (lastDigit > 5) {
+        fire.scale.set(0.25, 0.8, 0.25);
+    } else {
+        fire.scale.set(0.2, 0.6, 0.2);
+    }
+    scaleCounter++;
+}
+
 function computeFrame(time) {
 
     birdIntersectsObstacle();
     removePreviousObstacles();
+    animateRocketFire();
 
     //sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
