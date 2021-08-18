@@ -186,12 +186,38 @@ function createRocketWindow() {
 }
 
 function createRocketTube() {
-    var radius =  0.2, tubeRadius =  0.5, radialSegments = 8, tubularSegments = 100, p =  1, q = 20;  
+    var radius =  0.4, tubeRadius =  0.5, radialSegments = 8, tubularSegments = 100, p =  1, q = 20;  
 
     var geometry = new THREE.TorusKnotGeometry(radius, tubeRadius, tubularSegments, radialSegments, p, q);
     var material = new THREE.MeshBasicMaterial({color: 0x606060});
     var mesh = new THREE.Mesh(geometry, material);
     return mesh;
+}
+
+function createRocketFire() {
+    var group = new THREE.Group();
+
+    var shape = new THREE.Shape();
+    shape.moveTo(4, 0);
+    shape.bezierCurveTo(5, -2, 3, -5, 0, -8);
+    shape.bezierCurveTo(-3, -5, -5, -2, -4, 0);
+    shape.lineTo(4, 0);
+
+    var extrudeSettings = {steps: 2, depth: 0.3, bevelEnabled: false, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
+
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var outsideMaterial = new THREE.MeshBasicMaterial({color: 0xf28c28});
+    var outsideMesh = new THREE.Mesh(geometry, outsideMaterial);
+
+    var insideMaterial = new THREE.MeshBasicMaterial({color: 0xffd700});
+    var insideMesh = new THREE.Mesh(geometry, insideMaterial);
+
+    insideMesh.scale.set(0.7, 0.7, 0.7);
+    insideMesh.position.set(0, 0.1, 0.5);
+
+    group.add(outsideMesh);
+    group.add(insideMesh);
+    return group;
 }
 
 function createRocket() {
@@ -214,7 +240,12 @@ function createRocket() {
 
     var tube = createRocketTube();
     tube.rotation.x = Math.PI/2;
-    tube.position.y = -1;
+    tube.position.y = -1.2;
+
+    var fire = createRocketFire();
+    fire.scale.set(0.2, 0.6, 0.2);
+    fire.position.y = -1.8;
+    fire.name = "fire";
 
     rocket.add(head);
     rocket.add(tail);
@@ -222,6 +253,7 @@ function createRocket() {
     rocket.add(wing1);
     rocket.add(wing2);
     rocket.add(tube);
+    rocket.add(fire);
 
     return rocket;
 }
@@ -288,7 +320,21 @@ var obstacleID = 1;
 
 var gameOver = true;
 
+var scaleCounter = 0;
+
 function computeFrame(time) {
+
+    var fire = sceneElements.sceneGraph.getObjectByName("fire");
+    var scaleCounterString = scaleCounter.toString();
+    var lastDigitString = scaleCounterString[scaleCounterString.length - 1];
+    var lastDigit = parseInt(lastDigitString); // between 0 and 9
+    console.log(lastDigit);
+    if (lastDigit > 5) {
+        fire.scale.set(0.25, 0.8, 0.25);
+    } else {
+        fire.scale.set(0.2, 0.6, 0.2);
+    }
+    scaleCounter++;
 
     // Rendering
     helper.render(sceneElements);
