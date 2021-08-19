@@ -345,9 +345,31 @@ var times = 0;
 
 var obstaclePosition = sceneElements.camera.position.z - 100;
 
+var obstaclePositionLater = -100;
+
 var obstacleID = 1;
 
 var gameOver = true;
+
+var index = 0;
+
+function createNewObstacle() {
+    var centerPosition = randomIntFromInterval(20, 60);
+    if (sceneElements.centerPositionValues.length >= 2) {
+        while (Math.abs(sceneElements.centerPositionValues[sceneElements.centerPositionValues.length - 1] - centerPosition) > 20) {
+            centerPosition = randomIntFromInterval(20, 60);
+        }
+    }
+    sceneElements.centerPositionValues.push(centerPosition);
+    var obstacle = createObstacle(centerPosition, 10);
+    obstacle.position.z = obstaclePositionLater;
+    obstaclePositionLater -= 50;
+    sceneElements.sceneGraph.add(obstacle);
+    obstacle.name = obstacleID;
+    obstacleID += 1;
+}
+
+
 function rocketIntersectsObstacle() {
     var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
     var raycaster = new THREE.Raycaster();
@@ -366,11 +388,11 @@ function rocketIntersectsObstacle() {
 function removePreviousObstacles() {
     var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
     for (var i=0; i<sceneElements.obstaclesGroup.length; i++) {
-        var oldObstacle = sceneElements.obstaclesGroup[0];
-        if (Math.abs(rocket.position.z - oldObstacle.position.z) > 200) {
-            //console.log(oldObstacle);
+        var oldObstacle = sceneElements.obstaclesGroup[i];
+        if (oldObstacle.position.z > rocket.position.z && Math.abs(rocket.position.z - oldObstacle.position.z) > 140) {
             sceneElements.sceneGraph.remove(oldObstacle);
             sceneElements.obstaclesGroup.splice(oldObstacle, 1); 
+            createNewObstacle();
         }
     }
 }
@@ -390,7 +412,6 @@ function animateRocketFire() {
 
 function computeFrame(time) {
 
-    console.log(sceneElements.obstaclesGroup.length);
     rocketIntersectsObstacle();
     removePreviousObstacles();
 
@@ -399,30 +420,26 @@ function computeFrame(time) {
 
     var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
     rocket.position.z -= 0.5;
-    
-    var target = new THREE.Vector3();
-    /*
-    console.log(sceneElements.camera.getWorldPosition(target));
-    console.log(sceneElements.camera);
-    */
 
-    // Adding obstacles loop
-    var centerPosition = randomIntFromInterval(20, 60);
-    if (sceneElements.centerPositionValues.length >= 2) {
-        while (Math.abs(sceneElements.centerPositionValues[sceneElements.centerPositionValues.length - 1] - centerPosition) > 20) {
-            centerPosition = randomIntFromInterval(20, 60);
+    // Add first couple of obstacles (the rest will be added while removing the old ones)
+    if (index < 4) {
+        var centerPosition = randomIntFromInterval(20, 60);
+        if (sceneElements.centerPositionValues.length >= 2) {
+            while (Math.abs(sceneElements.centerPositionValues[sceneElements.centerPositionValues.length - 1] - centerPosition) > 20) {
+                centerPosition = randomIntFromInterval(20, 60);
+            }
         }
+        sceneElements.centerPositionValues.push(centerPosition);
+        var obstacle = createObstacle(centerPosition, 10);
+        obstacle.position.z = obstaclePosition;
+        obstaclePosition -= 50;
+        sceneElements.sceneGraph.add(obstacle);
+        obstacle.name = obstacleID;
+        obstacleID += 1;
+        index += 1;
     }
-    sceneElements.centerPositionValues.push(centerPosition);
-    var obstacle = createObstacle(centerPosition, 10);
-    obstacle.position.z = obstaclePosition;
-    obstaclePosition -= 50;
-    sceneElements.sceneGraph.add(obstacle);
-    obstacle.name = obstacleID;
-    obstacleID += 1;
     
     // Position-y of rocket increases when pressing space
-    
     if (space) {
         var initialPosition = rocket.position.y;
         if (sceneElements.rocketInitialPosition.length > 0 && rocketFlag) {
@@ -430,7 +447,6 @@ function computeFrame(time) {
                 //deltarocketY *= -1; 
                 sceneElements.rocketInitialPosition = [];
                 rocketFlag = false;
-                //console.log(rocketFlag);
             }
         }
 
@@ -449,7 +465,6 @@ function computeFrame(time) {
     } else if (!space) {
         rocket.position.y -= 3*deltaRocketY;
         rocketFlag = true;
-        //console.log(rocketFlag);
     }
 
     
