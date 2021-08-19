@@ -7,6 +7,14 @@ const helper = {
         // Create the 3D scene
         sceneElements.sceneGraph = new THREE.Scene();
 
+        /*
+        //Get your video element
+        const video = document.getElementById('video');
+
+        // Create video texture
+        const videoTexture = new THREE.VideoTexture(video);
+        sceneElements.sceneGraph.background = videoTexture;
+        */
 
         // Add camera
         const width = window.innerWidth;

@@ -390,6 +390,7 @@ function animateRocketFire() {
 
 function computeFrame(time) {
 
+    console.log(sceneElements.obstaclesGroup.length);
     rocketIntersectsObstacle();
     removePreviousObstacles();
 
