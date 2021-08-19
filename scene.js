@@ -284,6 +284,17 @@ function createRocket() {
     return rocket;
 }
 
+function createBackground() {
+    var group = new THREE.Group();
+
+    var planeGeometry = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight);
+    var planeMaterial = new THREE.MeshBasicMaterial({color: 0x000821});
+    var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.rotation.y = Math.PI/2;
+
+    group.add(plane);
+    return group;
+}
 // function to return a random integer between two values
 function randomIntFromInterval(min, max) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min)
@@ -308,6 +319,12 @@ function load3DObjects(sceneGraph) {
     planeObject.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
     // Set shadow property
     planeObject.receiveShadow = true;
+
+    // Create background
+    var background = createBackground();
+    background.name = "background";
+    background.position.set(-20, sceneElements.camera.position.y, sceneElements.camera.position.z);
+    sceneElements.sceneGraph.add(background);
 
     // create rocket/player
     var rocket = createRocket();
@@ -420,6 +437,9 @@ function computeFrame(time) {
 
     var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
     rocket.position.z -= 0.5;
+
+    var background = sceneElements.sceneGraph.getObjectByName("background");
+    background.position.z -= 0.5;
 
     // Add first couple of obstacles (the rest will be added while removing the old ones)
     if (index < 4) {
