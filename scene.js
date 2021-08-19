@@ -284,6 +284,13 @@ function createRocket() {
     return rocket;
 }
 
+function createCircle(radius) {
+    var geometry = new THREE.CircleGeometry(radius, 50);
+    var material = new THREE.MeshBasicMaterial({color: 0xffffff});
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.y = Math.PI/2;
+    return mesh;
+}
 function createBackground() {
     var group = new THREE.Group();
 
@@ -292,14 +299,32 @@ function createBackground() {
     var plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.y = Math.PI/2;
 
+    // creating particles
+    for (var i=0; i<250; i++) {
+        var particle = createCircle(randomFromInterval(0, 0.02));
+        particle.position.set(0, randomFromInterval(-50, 50), randomFromInterval(-200, 200));
+        group.add(particle);
+
+        var star = createStar(randomFromInterval(0, 0.2), false);
+        var random = randomIntFromInterval(0, 3);
+        star.scale.set(random/10, random/10, random/10);
+        star.rotation.z = Math.PI/2;
+        star.position.set(0, randomFromInterval(-50, 50), randomFromInterval(-200, 200));
+        group.add(star);
+
+    }
+
     group.add(plane);
     return group;
 }
 // function to return a random integer between two values
 function randomIntFromInterval(min, max) { // min and max included 
-    return Math.floor(Math.random() * (max - min + 1) + min)
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+function randomFromInterval(min, max) {
+    return Math.random() * (max - min + 1) + min;
+}
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
