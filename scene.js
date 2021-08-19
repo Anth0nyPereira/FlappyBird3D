@@ -268,6 +268,7 @@ function createRocket() {
     tube.position.y = -1.2;
 
     var fire = createRocketFire();
+    fire.visible = false;
     fire.scale.set(0.2, 0.6, 0.2);
     fire.position.y = -1.8;
     fire.name = "fire";
@@ -377,6 +378,7 @@ var scaleCounter = 0;
 
 function animateRocketFire() {
     var fire = sceneElements.sceneGraph.getObjectByName("fire");
+    fire.visible = true;
     var scaleCounterString = scaleCounter.toString();
     var lastDigitString = scaleCounterString[scaleCounterString.length - 1];
     var lastDigit = parseInt(lastDigitString); // between 0 and 9
@@ -392,7 +394,6 @@ function computeFrame(time) {
 
     rocketIntersectsObstacle();
     removePreviousObstacles();
-    animateRocketFire();
 
     sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
@@ -434,11 +435,14 @@ function computeFrame(time) {
             }
         }
 
-        if (rocketFlag) {
+        if (rocketFlag) { // rocket going up, need to show the fire
             sceneElements.rocketInitialPosition.push(initialPosition);
-            //console.log(sceneElements.rocketInitialPosition);
+
+            animateRocketFire();
+
             rocket.position.y += 6*deltaRocketY;
         } else if (!rocketFlag) {
+            sceneElements.sceneGraph.getObjectByName("fire").visible = false;
             rocket.position.y -= 3*deltaRocketY;
         }
         
