@@ -379,10 +379,7 @@ var scaleCounter = 0;
 function animateRocketFire() {
     var fire = sceneElements.sceneGraph.getObjectByName("fire");
     fire.visible = true;
-    var scaleCounterString = scaleCounter.toString();
-    var lastDigitString = scaleCounterString[scaleCounterString.length - 1];
-    var lastDigit = parseInt(lastDigitString); // between 0 and 9
-    if (lastDigit > 5) {
+    if (scaleCounter % 2  == 0) {
         fire.scale.set(0.25, 0.8, 0.25);
     } else {
         fire.scale.set(0.2, 0.6, 0.2);
