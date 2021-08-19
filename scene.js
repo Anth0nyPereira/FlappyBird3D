@@ -9,6 +9,7 @@ const sceneElements = {
     rocketInitialPosition: null,
     centerPositionValues: null,
     obstaclesGroup: null,
+    backgroundObjects: null,
 };
 
 helper.initEmptyScene(sceneElements);
@@ -304,6 +305,7 @@ function createBackground() {
         var particle = createCircle(randomFromInterval(0, 0.02));
         particle.position.set(0, randomFromInterval(-50, 50), randomFromInterval(-200, 200));
         group.add(particle);
+        sceneElements.backgroundObjects.push(particle);
 
         var star = createStar(randomFromInterval(0, 0.2), false);
         var random = randomIntFromInterval(0, 3);
@@ -311,6 +313,13 @@ function createBackground() {
         star.rotation.z = Math.PI/2;
         star.position.set(0, randomFromInterval(-50, 50), randomFromInterval(-200, 200));
         group.add(star);
+        sceneElements.backgroundObjects.push(star);
+
+        if (i > 125) {
+            particle.visible = false;
+            star.visible = false;
+        }
+
 
     }
 
@@ -346,6 +355,8 @@ function load3DObjects(sceneGraph) {
     planeObject.receiveShadow = true;
 
     // Create background
+    // Initialize array that will store all objects from the background (circles, stars, ...)
+    sceneElements.backgroundObjects = [];
     var background = createBackground();
     background.name = "background";
     background.position.set(-20, sceneElements.camera.position.y, sceneElements.camera.position.z);
@@ -394,6 +405,8 @@ var obstacleID = 1;
 var gameOver = true;
 
 var index = 0;
+
+var animateBackgroundCounter = 0;
 
 function createNewObstacle() {
     var centerPosition = randomIntFromInterval(20, 60);
@@ -452,10 +465,23 @@ function animateRocketFire() {
     scaleCounter++;
 }
 
+function animateBackground() {
+    for (var i=0; i<sceneElements.backgroundObjects.length; i++) {
+        if (sceneElements.backgroundObjects[i].visible && animateBackgroundCounter % 2 == 0) {
+            sceneElements.backgroundObjects[i].visible = false;
+            animateBackgroundCounter += 1;
+        } else if (!sceneElements.backgroundObjects[i].visible && animateBackgroundCounter % 2 != 0) {
+            sceneElements.backgroundObjects[i].visible = true;
+            animateBackgroundCounter += 1;
+        }
+    }
+}
+
 function computeFrame(time) {
 
     rocketIntersectsObstacle();
     removePreviousObstacles();
+    animateBackground();
 
     sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
