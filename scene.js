@@ -309,8 +309,9 @@ function load3DObjects(sceneGraph) {
     // Set shadow property
     planeObject.receiveShadow = true;
 
-    // FOR TESTING PURPOSES
+    // create rocket/player
     var rocket = createRocket();
+    rocket.scale.set(0.7, 0.7, 0.7);
     rocket.position.set(0, sceneElements.camera.position.y, sceneElements.camera.position.z);
     rocket.rotation.y = Math.PI/2;
     rocket.rotation.z = -Math.PI/2;
