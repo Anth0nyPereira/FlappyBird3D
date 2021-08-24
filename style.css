@@ -2,3 +2,16 @@
 body { 
 	margin: 0px;
 }
+
+@font-face { font-family: SpaceAge; src: url('/resources/space-age.ttf'); } 
+
+#score_paragraph {
+	font-family: SpaceAge;
+	position: absolute; 
+	display: block; 
+	z-index: 99; 
+	left: 70%; 
+	top: -5%; 
+	color: white; 
+	font-size: 3vw;
+}
