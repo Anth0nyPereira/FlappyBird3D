@@ -409,14 +409,14 @@ var index = 0;
 var animateBackgroundCounter = 0;
 
 function createNewObstacle() {
-    var centerPosition = randomIntFromInterval(20, 60);
+    var centerPosition = randomIntFromInterval(25, 60);
     if (sceneElements.centerPositionValues.length >= 2) {
         while (Math.abs(sceneElements.centerPositionValues[sceneElements.centerPositionValues.length - 1] - centerPosition) > 20) {
-            centerPosition = randomIntFromInterval(20, 60);
+            centerPosition = randomIntFromInterval(25, 60);
         }
     }
     sceneElements.centerPositionValues.push(centerPosition);
-    var obstacle = createObstacle(centerPosition, 10);
+    var obstacle = createObstacle(centerPosition, 15);
     obstacle.position.z = obstaclePositionLater;
     obstaclePositionLater -= 50;
     sceneElements.sceneGraph.add(obstacle);
@@ -494,14 +494,14 @@ function computeFrame(time) {
 
     // Add first couple of obstacles (the rest will be added while removing the old ones)
     if (index < 4) {
-        var centerPosition = randomIntFromInterval(20, 60);
+        var centerPosition = randomIntFromInterval(25, 60);
         if (sceneElements.centerPositionValues.length >= 2) {
             while (Math.abs(sceneElements.centerPositionValues[sceneElements.centerPositionValues.length - 1] - centerPosition) > 20) {
-                centerPosition = randomIntFromInterval(20, 60);
+                centerPosition = randomIntFromInterval(25, 60);
             }
         }
         sceneElements.centerPositionValues.push(centerPosition);
-        var obstacle = createObstacle(centerPosition, 10);
+        var obstacle = createObstacle(centerPosition, 15);
         obstacle.position.z = obstaclePosition;
         obstaclePosition -= 50;
         sceneElements.sceneGraph.add(obstacle);
