@@ -477,11 +477,39 @@ function animateBackground() {
     }
 }
 
+function increaseScore() {
+    var score = document.getElementById("score").textContent;
+    score = parseInt(score);
+    score += 1;
+    score = score.toString();
+    var scoreLength = score.toString().length;
+    var missingZeros = 3 - scoreLength;
+    
+    for (var i = 0; i < missingZeros; i++) {
+        score = "0" + score;
+    }
+    document.getElementById("score").textContent=score;
+}
+
+function roundToOneDecimalPlace(number) {
+    return Math.round(number * 10) / 10;
+} 
+
+function checkIfRocketSurpassedObstacle() {
+    var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
+    sceneElements.obstaclesGroup.forEach(obstacle => {
+        if (roundToOneDecimalPlace(rocket.position.z) == roundToOneDecimalPlace(obstacle.position.z)) {
+            increaseScore();
+        }
+    });
+}
+
 function computeFrame(time) {
 
     rocketIntersectsObstacle();
     removePreviousObstacles();
     animateBackground();
+    checkIfRocketSurpassedObstacle();
 
     sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
@@ -537,8 +565,6 @@ function computeFrame(time) {
         rocket.position.y -= 3*deltaRocketY;
         rocketFlag = true;
     }
-
-    
 
     // Rendering
     helper.render(sceneElements);
