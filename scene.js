@@ -10,6 +10,7 @@ const sceneElements = {
     centerPositionValues: null,
     obstaclesGroup: null,
     backgroundObjects: null,
+    initialBackgroundColor: null,
 };
 
 helper.initEmptyScene(sceneElements);
@@ -297,17 +298,19 @@ function createBackground() {
 
     var planeGeometry = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight);
     var planeMaterial = new THREE.MeshBasicMaterial({color: 0x000821});
+    sceneElements.initialBackgroundColor = planeMaterial.color; // store it for later --> so that I can change the background color to its original color and repeat the cycle
     var plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.y = Math.PI/2;
+    plane.name = "plane";
 
     // creating particles
     for (var i=0; i<250; i++) {
-        var particle = createCircle(randomFromInterval(0, 0.02));
+        var particle = createCircle(randomFromInterval(0.002, 0.02));
         particle.position.set(0, randomFromInterval(-50, 50), randomFromInterval(-200, 200));
         group.add(particle);
         sceneElements.backgroundObjects.push(particle);
 
-        var star = createStar(randomFromInterval(0, 0.2), false);
+        var star = createStar(randomFromInterval(0.002, 0.2), false);
         var random = randomIntFromInterval(0, 3);
         star.scale.set(random/10, random/10, random/10);
         star.rotation.z = Math.PI/2;
@@ -504,7 +507,56 @@ function checkIfRocketSurpassedObstacle() {
     });
 }
 
+function randomElementFromArray(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
+function updateBackgroundColor() {
+    var plane = sceneElements.sceneGraph.getObjectByName("plane");
+    var color = plane.material.color;
+
+    var r = color.r, g = color.g, b = color.b;
+
+    /*
+    var randomColor = "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}); 
+    color.set(randomColor);
+    */
+
+
+    var rgbArray = [];
+    rgbArray.push(r);
+    rgbArray.push(g);
+    rgbArray.push(b);
+
+    var randomRGB = randomElementFromArray(rgbArray);
+
+    var flagsArray = [0, 1];
+
+    console.log("R: " + r.toString());
+    console.log("G: " + g.toString());
+    console.log("B: " + b.toString());
+
+    if (r <= 0.4) {
+        r += 0.0005;
+    } else if (r > 0.4 && b <= 0.4) {
+        b += 0.0005;
+    } else if (b > 0.4 && g <= 0.02) {
+        g += 0.005;
+        alert("g");
+    } else {
+        r = sceneElements.initialBackgroundColor.r;
+        g = sceneElements.initialBackgroundColor.g;
+        b = sceneElements.initialBackgroundColor.b;
+    }
+
+    color.setRGB(r, g, b);
+    // console.log(color.r, color.g, color.b);
+
+}
+
 function computeFrame(time) {
+
+    updateBackgroundColor();
 
     rocketIntersectsObstacle();
     removePreviousObstacles();
