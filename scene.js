@@ -347,7 +347,9 @@ function createFlyingSaucer() {
     disc.rotation.x = Math.PI/2;
     disc.position.y = -2;
 
-    var discLine = addLineSegment(discGeometry, 0x000000, 0.1);
+    var discLine = addLineSegment(discGeometry, 0x000000, 1);
+    discLine.rotation.x = Math.PI/2;
+    discLine.position.y = -2;
 
     // little lights - blue circles -- that will change its color to glowing-yellow
     var lights = new THREE.Group();
@@ -362,6 +364,7 @@ function createFlyingSaucer() {
 
     group.add(glass);
     group.add(disc);
+    group.add(discLine);
     group.rotation.z = -0.5;
     group.add(lights);
     return group;
