@@ -11,6 +11,7 @@ const sceneElements = {
     obstaclesGroup: null,
     backgroundObjects: null,
     initialBackgroundColor: null,
+    flyingSaucerLevitationObjects: null,
 };
 
 helper.initEmptyScene(sceneElements);
@@ -377,6 +378,7 @@ function createFlyingSaucer() {
     for (var i=4; i>0; i--) {
         var levitateComponent = createFlyingSaucerLevitatingComponent(i/1.5);
         levitateComponent.position.set(12, 2.3*i - 4, 0);
+        levitateComponent.visible = false;
         levitate.add(levitateComponent);
     }
     levitate.scale.z = 1.4;
@@ -391,6 +393,49 @@ function createFlyingSaucer() {
     group.add(levitate);
     return group;
 }
+function checkIfObjectisVisible(object) {
+    return object.visible == true;
+}
+function turnObjectInvisible(object) {
+    object.visible = false;
+}
+
+function animateAllLevitationFlyingSaucers() {
+    for (var [key, group] of Object.entries(sceneElements.flyingSaucerLevitationObjects)) {
+        animateLevitationFlyingSaucer(group);
+    }      
+}
+
+function animateLevitationFlyingSaucer(group) {
+    var levitateComponents = group.children;
+    for (var i=0; i<levitateComponents.length; i++) {
+        if (i != 0 && i != levitateComponents.length - 1) {
+            if (levitateComponents[i-1].visible && !levitateComponents[i].visible) {
+                console.log("middle being turned on!");
+                levitateComponents[i].visible = true;
+                return;
+            }
+        } else if (i == 0) {
+            if (!levitateComponents[0].visible) {
+                console.log("1st being turned on!");
+                levitateComponents[0].visible = true;
+                return;
+            }
+        } else {
+            if (!levitateComponents[levitateComponents.length - 1].visible) {
+                console.log("last being turned on!");
+                levitateComponents[levitateComponents.length - 1].visible = true;
+                return;
+            } else {
+                console.log("reset!");
+                levitateComponents.forEach(component => {
+                    component.visible = false;
+                });
+                return;
+            }
+        }       
+    }
+}
 
 function createBackground() {
     var group = new THREE.Group();
@@ -402,6 +447,16 @@ function createBackground() {
     plane.rotation.y = Math.PI/2;
     plane.name = "plane";
 
+    // creating flying saucers
+    for (var i=0; i<5; i++) {
+        var flyingSaucer = createFlyingSaucer();
+        var levitate = flyingSaucer.children[4];
+        console.log(levitate);
+        levitate.name = "levitate" + (i+1);
+        sceneElements.flyingSaucerLevitationObjects[levitate.name] = levitate;
+        flyingSaucer.position.set(-1, 0, 20*i);
+        group.add(flyingSaucer);
+    }
     // creating particles
     for (var i=0; i<250; i++) {
         /*
@@ -426,10 +481,6 @@ function createBackground() {
             star.visible = false;
         }
     }
-
-    // TESTING -- add a flying saucer
-    var flyingSaucer1 = createFlyingSaucer();
-    group.add(flyingSaucer1);
 
     group.add(plane);
     return group;
@@ -471,6 +522,10 @@ function load3DObjects(sceneGraph) {
     // Create background
     // Initialize array that will store all objects from the background (circles, stars, ...)
     sceneElements.backgroundObjects = [];
+
+    // Initialize dict that will store the levitating components of each flying saucer --> to make a little animation
+    sceneElements.flyingSaucerLevitationObjects = {};
+
     var background = createBackground();
     background.name = "background";
     background.position.set(-20, sceneElements.camera.position.y, sceneElements.camera.position.z);
@@ -673,6 +728,7 @@ function rotateParticles() {
     }
 }
 
+var animateLevitateCounter = 0;
 function computeFrame(time) {
 
     //updateBackgroundColor();
@@ -682,6 +738,12 @@ function computeFrame(time) {
     animateBackground();
     checkIfRocketSurpassedObstacle();
     // rotateParticles();
+
+    if (animateLevitateCounter % 20 == 0) {
+        animateAllLevitationFlyingSaucers();
+        animateLevitateCounter += 1;
+    }
+    animateLevitateCounter += 1;
 
     //sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
