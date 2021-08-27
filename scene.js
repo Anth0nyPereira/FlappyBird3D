@@ -70,8 +70,8 @@ function createStar(height, withLines) { // added a new argument so that I can r
     star.add(star2);
 
     if (withLines) {
-        var line1 = addLineSegment(geometry, 0xfe1493);
-        var line2 = addLineSegment(geometry, 0xfe1493);
+        var line1 = addLineSegment(geometry, 0xfe1493, 50);
+        var line2 = addLineSegment(geometry, 0xfe1493, 50);
         line2.rotation.y = Math.PI;
 
         star.add(line1);
@@ -81,9 +81,9 @@ function createStar(height, withLines) { // added a new argument so that I can r
     return star;
 }
 
-function addLineSegment(geometry, color) {
+function addLineSegment(geometry, color, lineWidth) {
     var edgesGeometry = new THREE.EdgesGeometry(geometry);
-    var material = new THREE.LineBasicMaterial({color: color, linewidth: 50});
+    var material = new THREE.LineBasicMaterial({color: color, linewidth: lineWidth});
     var line = new THREE.LineSegments(edgesGeometry, material);
     return line;
 }
@@ -286,12 +286,22 @@ function createRocket() {
     return rocket;
 }
 
-function createCircle(radius, color) {
+function createCircle(radius, color, withLineSegments=false, lineWidth=0) {
+    var circle = new THREE.Group();
+
     var geometry = new THREE.CircleGeometry(radius, 50);
     var material = new THREE.MeshBasicMaterial({color: color});
     var mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.y = Math.PI/2;
-    return mesh;
+    circle.add(mesh);
+
+    if (withLineSegments) {
+        var line1 = addLineSegment(geometry, 0xffbf00, lineWidth);
+        line1.rotation.y = Math.PI/2;
+        circle.add(line1);
+    }
+    
+    return circle;
 }
 
 function createMoon(size) {
@@ -337,16 +347,18 @@ function createFlyingSaucer() {
     disc.rotation.x = Math.PI/2;
     disc.position.y = -2;
 
+    var discLine = addLineSegment(discGeometry, 0x000000, 0.1);
+
     // little lights - blue circles -- that will change its color to glowing-yellow
     var lights = new THREE.Group();
-    for (var i=0; i<6; i++) {
-        var light = createCircle(0.5, 0xc70039);
-        light.position.set(8, -4*Math.sin(i*Math.PI/6), -4*Math.cos(i*Math.PI/6));
+    for (var i=0; i<5; i++) {
+        var light = createCircle(0.5, 0xc70039, true, 3);
+        light.position.set(8, -3*Math.sin(i*Math.PI/4.3), -3*Math.cos(i*Math.PI/4.3));
         lights.add(light);
     }
-    lights.rotation.x = -0.15;
-    lights.scale.set(1, 0.8, 1.2);
-    lights.position.y = 2.8;
+    // lights.rotation.x = -0.25;
+    lights.scale.set(1, 0.7, 1.5);
+    lights.position.y = 2;
 
     group.add(glass);
     group.add(disc);
