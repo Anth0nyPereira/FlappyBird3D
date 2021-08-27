@@ -286,13 +286,75 @@ function createRocket() {
     return rocket;
 }
 
-function createCircle(radius) {
+function createCircle(radius, color) {
     var geometry = new THREE.CircleGeometry(radius, 50);
-    var material = new THREE.MeshBasicMaterial({color: 0xffffff});
+    var material = new THREE.MeshBasicMaterial({color: color});
     var mesh = new THREE.Mesh(geometry, material);
     mesh.rotation.y = Math.PI/2;
     return mesh;
 }
+
+function createMoon(size) {
+    var shape = new THREE.Shape();
+    shape.moveTo(4, 0.5);
+    shape.bezierCurveTo(2.5, 0, 0, 2, 4, 4.5);
+    shape.bezierCurveTo(3, 3, 2, 2, 4, 0.5);
+
+    var extrudeSettings = {steps: 2, depth: 0.1, bevelEnabled: false, bevelThickness: 1, bevelSize: 1, bevelSegments: 10};
+    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    var material = new THREE.MeshBasicMaterial({color: randomColor()});
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.scale.set(size, size, size);
+    mesh.rotation.y = Math.PI/2;
+    return mesh;
+}
+
+function createStarWithMoons(size) {
+    var group = new THREE.Group();
+
+    for (var i=0; i<1; i++) {
+        var moon = createMoon();
+        moon.rotation.y = -Math.PI/2;
+        group.add(moon);
+    }
+
+    return group;
+}
+
+function createFlyingSaucer() {
+    var group = new THREE.Group();
+
+    // blue glass -- where we can see an E.T.
+    var glassGeometry = new THREE.SphereGeometry(4, 30, 30);
+    var glassMaterial = new THREE.MeshBasicMaterial({color: 0xadd8e6});
+    var glass = new THREE.Mesh(glassGeometry, glassMaterial);
+
+    // disc - the inferior component of the flying saucer
+    var radius = 5, tubeRadius =  1.75, radialSegments =  9, tubularSegments = 24;  
+    var discGeometry = new THREE.TorusGeometry(radius, tubeRadius, radialSegments, tubularSegments);
+    var discMaterial = new THREE.MeshBasicMaterial({color: 0xaaff00});
+    var disc = new THREE.Mesh(discGeometry, discMaterial);
+    disc.rotation.x = Math.PI/2;
+    disc.position.y = -2;
+
+    // little lights - blue circles -- that will change its color to glowing-yellow
+    var lights = new THREE.Group();
+    for (var i=0; i<6; i++) {
+        var light = createCircle(0.5, 0xc70039);
+        light.position.set(8, -4*Math.sin(i*Math.PI/6), -4*Math.cos(i*Math.PI/6));
+        lights.add(light);
+    }
+    lights.rotation.x = -0.15;
+    lights.scale.set(1, 0.8, 1.2);
+    lights.position.y = 2.8;
+
+    group.add(glass);
+    group.add(disc);
+    group.rotation.z = -0.5;
+    group.add(lights);
+    return group;
+}
+
 function createBackground() {
     var group = new THREE.Group();
 
@@ -305,10 +367,14 @@ function createBackground() {
 
     // creating particles
     for (var i=0; i<250; i++) {
-        var particle = createCircle(randomFromInterval(0.002, 0.02));
-        particle.position.set(0, randomFromInterval(-50, 50), randomFromInterval(-200, 200));
+        /*
+        var particle = createStarWithMoons(randomFromInterval(0.002, 0.02));
+        var particle = createMoon(10);
+        particle.position.set(0, randomFromInterval(-20, 20), randomFromInterval(-100, 100));
         group.add(particle);
         sceneElements.backgroundObjects.push(particle);
+        particle.name = "particle" + i;
+        */
 
         var star = createStar(randomFromInterval(0.002, 0.2), false);
         var random = randomIntFromInterval(0, 3);
@@ -319,16 +385,24 @@ function createBackground() {
         sceneElements.backgroundObjects.push(star);
 
         if (i > 125) {
-            particle.visible = false;
+            // particle.visible = false;
             star.visible = false;
         }
-
-
     }
+
+    // TESTING -- add a flying saucer
+    var flyingSaucer1 = createFlyingSaucer();
+    group.add(flyingSaucer1);
 
     group.add(plane);
     return group;
 }
+
+// function that returns a random hexa code corresponding to a color
+function randomColor() {
+    return "#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}); 
+}
+
 // function to return a random integer between two values
 function randomIntFromInterval(min, max) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -531,10 +605,11 @@ function updateBackgroundColor() {
     var randomRGB = randomElementFromArray(rgbArray);
 
     var flagsArray = [0, 1];
-
+    /*
     console.log("R: " + r.toString());
     console.log("G: " + g.toString());
     console.log("B: " + b.toString());
+    */
 
     if (r <= 0.4) {
         r += 0.0005;
@@ -554,23 +629,31 @@ function updateBackgroundColor() {
 
 }
 
+function rotateParticles() {
+    for (var i=0; i<250; i++) {
+        var particle = sceneElements.sceneGraph.getObjectByName("particle" + i);
+        particle.rotation.x += Math.random();
+    }
+}
+
 function computeFrame(time) {
 
-    updateBackgroundColor();
+    //updateBackgroundColor();
 
     rocketIntersectsObstacle();
     removePreviousObstacles();
     animateBackground();
     checkIfRocketSurpassedObstacle();
+    // rotateParticles();
 
-    sceneElements.camera.position.z -= 0.5;
+    //sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
 
     var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
-    rocket.position.z -= 0.5;
+    //rocket.position.z -= 0.5;
 
     var background = sceneElements.sceneGraph.getObjectByName("background");
-    background.position.z -= 0.5;
+    //background.position.z -= 0.5;
 
     // Add first couple of obstacles (the rest will be added while removing the old ones)
     if (index < 4) {
