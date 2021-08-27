@@ -331,6 +331,15 @@ function createStarWithMoons(size) {
     return group;
 }
 
+function createFlyingSaucerLevitatingComponent(size) {
+    var radius = size, tubeRadius =  0.15, radialSegments =  30, tubularSegments = 100;  
+    var geometry = new THREE.TorusGeometry(radius, tubeRadius, radialSegments, tubularSegments);
+    var material = new THREE.MeshBasicMaterial({color: 0x7fffd4});
+    var mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.x = Math.PI/2;
+    return mesh;
+}
+
 function createFlyingSaucer() {
     var group = new THREE.Group();
 
@@ -353,20 +362,33 @@ function createFlyingSaucer() {
 
     // little lights - blue circles -- that will change its color to glowing-yellow
     var lights = new THREE.Group();
+    lights.name = "lights";
     for (var i=0; i<5; i++) {
         var light = createCircle(0.5, 0xc70039, true, 3);
         light.position.set(8, -3*Math.sin(i*Math.PI/4.3), -3*Math.cos(i*Math.PI/4.3));
         lights.add(light);
     }
-    // lights.rotation.x = -0.25;
     lights.scale.set(1, 0.7, 1.5);
     lights.position.y = 2;
+
+    // levitation component
+    var levitate = new THREE.Group();
+    levitate.name = "levitate";
+    for (var i=4; i>0; i--) {
+        var levitateComponent = createFlyingSaucerLevitatingComponent(i/1.5);
+        levitateComponent.position.set(12, 2.3*i - 4, 0);
+        levitate.add(levitateComponent);
+    }
+    levitate.scale.z = 1.4;
+    levitate.position.y = -11;
+    levitate.rotation.z = 0.3;
 
     group.add(glass);
     group.add(disc);
     group.add(discLine);
     group.rotation.z = -0.5;
     group.add(lights);
+    group.add(levitate);
     return group;
 }
 
