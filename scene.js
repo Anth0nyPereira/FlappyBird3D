@@ -12,6 +12,7 @@ const sceneElements = {
     backgroundObjects: null,
     initialBackgroundColor: null,
     flyingSaucerLevitationObjects: null,
+    flyingSaucerLights: null,
 };
 
 helper.initEmptyScene(sceneElements);
@@ -365,7 +366,11 @@ function createFlyingSaucer() {
     var lights = new THREE.Group();
     lights.name = "lights";
     for (var i=0; i<5; i++) {
-        var light = createCircle(0.5, 0xc70039, true, 3);
+        if (i == 0) { // the first-one has already the light turned on
+            var light = createCircle(0.5, 0xffbf00, true, 3);
+        } else {
+            var light = createCircle(0.5, 0xc70039, true, 3);
+        }
         light.position.set(8, -3*Math.sin(i*Math.PI/4.3), -3*Math.cos(i*Math.PI/4.3));
         lights.add(light);
     }
@@ -391,6 +396,8 @@ function createFlyingSaucer() {
     group.rotation.z = -0.5;
     group.add(lights);
     group.add(levitate);
+
+    group.scale.set(0.8, 0.8, 0.8);
     return group;
 }
 function checkIfObjectisVisible(object) {
@@ -411,23 +418,23 @@ function animateLevitationFlyingSaucer(group) {
     for (var i=0; i<levitateComponents.length; i++) {
         if (i != 0 && i != levitateComponents.length - 1) {
             if (levitateComponents[i-1].visible && !levitateComponents[i].visible) {
-                console.log("middle being turned on!");
+                // console.log("middle being turned on!");
                 levitateComponents[i].visible = true;
                 return;
             }
         } else if (i == 0) {
             if (!levitateComponents[0].visible) {
-                console.log("1st being turned on!");
+                // console.log("1st being turned on!");
                 levitateComponents[0].visible = true;
                 return;
             }
         } else {
             if (!levitateComponents[levitateComponents.length - 1].visible) {
-                console.log("last being turned on!");
+                // console.log("last being turned on!");
                 levitateComponents[levitateComponents.length - 1].visible = true;
                 return;
             } else {
-                console.log("reset!");
+                // console.log("reset!");
                 levitateComponents.forEach(component => {
                     component.visible = false;
                 });
@@ -436,6 +443,51 @@ function animateLevitationFlyingSaucer(group) {
         }       
     }
 }
+
+function animateAllFlyingSaucerLights() {
+    for (var [key, group] of Object.entries(sceneElements.flyingSaucerLights)) {
+        animateFlyingSaucerLights(group);
+    }
+}
+
+function animateFlyingSaucerLights(group) {
+    var normalColor = new THREE.Color(0xc70039).getHexString();
+    var switchedOnColor = new THREE.Color(0xffbf00).getHexString();
+    var lights = group.children;
+    
+    // console.log(normalColor);
+    // console.log(lights[0].children[0].material.color.getHexString());
+    for (var i=0; i<lights.length; i++) {
+        var actualColor = lights[i].children[0].material.color.getHexString();
+        if (i != 0 && i != lights.length - 1) {
+            var previousColor = lights[i - 1].children[0].material.color.getHexString();
+            if (actualColor == normalColor && previousColor == switchedOnColor) {
+                // console.log("turning on a light in the middle");
+                lights[i].children[0].material.color.setHex(0xffbf00);
+                lights[i - 1].children[0].material.color.setHex(0xc70039);
+                return;
+            }
+        } else if (i == lights.length - 1) {
+            var previousColor = lights[i - 1].children[0].material.color.getHexString();
+            if (actualColor == normalColor && previousColor == switchedOnColor) {
+                // console.log("turning on in the last");
+                lights[i].children[0].material.color.setHex(0xffbf00);
+                lights[i - 1].children[0].material.color.setHex(0xc70039);
+                return;
+            } 
+        } else { // i = 0
+            var lastLightColor = lights[lights.length - 1].children[0].material.color.getHexString();
+            if (actualColor == normalColor && lastLightColor == switchedOnColor) {
+                lights[lights.length - 1].children[0].material.color.setHex(0xc70039);
+                lights[0].children[0].material.color.setHex(0xffbf00);
+                // console.log("turning on the first one");
+                return;
+            }
+            
+        }
+    }
+}
+
 
 function createBackground() {
     var group = new THREE.Group();
@@ -448,12 +500,16 @@ function createBackground() {
     plane.name = "plane";
 
     // creating flying saucers
-    for (var i=0; i<5; i++) {
+    for (var i=0; i<1; i++) {
         var flyingSaucer = createFlyingSaucer();
         var levitate = flyingSaucer.children[4];
-        console.log(levitate);
         levitate.name = "levitate" + (i+1);
         sceneElements.flyingSaucerLevitationObjects[levitate.name] = levitate;
+
+        var lights = flyingSaucer.children[3];
+        lights.name = "lights" + (i+1);
+        sceneElements.flyingSaucerLights[lights.name] = lights;
+
         flyingSaucer.position.set(-1, 0, 20*i);
         group.add(flyingSaucer);
     }
@@ -525,6 +581,9 @@ function load3DObjects(sceneGraph) {
 
     // Initialize dict that will store the levitating components of each flying saucer --> to make a little animation
     sceneElements.flyingSaucerLevitationObjects = {};
+
+    // Initialize dict that will store the lights of each flying saucer
+    sceneElements.flyingSaucerLights = {};
 
     var background = createBackground();
     background.name = "background";
@@ -741,6 +800,7 @@ function computeFrame(time) {
 
     if (animateLevitateCounter % 20 == 0) {
         animateAllLevitationFlyingSaucers();
+        animateAllFlyingSaucerLights();
         animateLevitateCounter += 1;
     }
     animateLevitateCounter += 1;
