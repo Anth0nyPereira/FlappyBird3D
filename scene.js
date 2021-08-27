@@ -13,6 +13,7 @@ const sceneElements = {
     initialBackgroundColor: null,
     flyingSaucerLevitationObjects: null,
     flyingSaucerLights: null,
+    circlesPath: null,
 };
 
 helper.initEmptyScene(sceneElements);
@@ -288,7 +289,7 @@ function createRocket() {
     return rocket;
 }
 
-function createCircle(radius, color, withLineSegments=false, lineWidth=0) {
+function createCircle(radius, color=0xffffff, withLineSegments=false, lineWidth=0) {
     var circle = new THREE.Group();
 
     var geometry = new THREE.CircleGeometry(radius, 50);
@@ -400,94 +401,20 @@ function createFlyingSaucer() {
     group.scale.set(0.8, 0.8, 0.8);
     return group;
 }
-function checkIfObjectisVisible(object) {
-    return object.visible == true;
-}
-function turnObjectInvisible(object) {
-    object.visible = false;
-}
 
-function animateAllLevitationFlyingSaucers() {
-    for (var [key, group] of Object.entries(sceneElements.flyingSaucerLevitationObjects)) {
-        animateLevitationFlyingSaucer(group);
-    }      
-}
+function createCirclesPath() {
+    var group = new THREE.Group();
 
-function animateLevitationFlyingSaucer(group) {
-    var levitateComponents = group.children;
-    for (var i=0; i<levitateComponents.length; i++) {
-        if (i != 0 && i != levitateComponents.length - 1) {
-            if (levitateComponents[i-1].visible && !levitateComponents[i].visible) {
-                // console.log("middle being turned on!");
-                levitateComponents[i].visible = true;
-                return;
-            }
-        } else if (i == 0) {
-            if (!levitateComponents[0].visible) {
-                // console.log("1st being turned on!");
-                levitateComponents[0].visible = true;
-                return;
-            }
-        } else {
-            if (!levitateComponents[levitateComponents.length - 1].visible) {
-                // console.log("last being turned on!");
-                levitateComponents[levitateComponents.length - 1].visible = true;
-                return;
-            } else {
-                // console.log("reset!");
-                levitateComponents.forEach(component => {
-                    component.visible = false;
-                });
-                return;
-            }
-        }       
+    sceneElements.circlesPath = [];
+
+    for (var i=-40; i<40; i+=0.5) {
+        var circle = createCircle(0.5);
+        circle.position.set(0, i, 5*Math.cos(i));
+        group.add(circle);
+        sceneElements.circlesPath.unshift(circle);
     }
+    return group;
 }
-
-function animateAllFlyingSaucerLights() {
-    for (var [key, group] of Object.entries(sceneElements.flyingSaucerLights)) {
-        animateFlyingSaucerLights(group);
-    }
-}
-
-function animateFlyingSaucerLights(group) {
-    var normalColor = new THREE.Color(0xc70039).getHexString();
-    var switchedOnColor = new THREE.Color(0xffbf00).getHexString();
-    var lights = group.children;
-    
-    // console.log(normalColor);
-    // console.log(lights[0].children[0].material.color.getHexString());
-    for (var i=0; i<lights.length; i++) {
-        var actualColor = lights[i].children[0].material.color.getHexString();
-        if (i != 0 && i != lights.length - 1) {
-            var previousColor = lights[i - 1].children[0].material.color.getHexString();
-            if (actualColor == normalColor && previousColor == switchedOnColor) {
-                // console.log("turning on a light in the middle");
-                lights[i].children[0].material.color.setHex(0xffbf00);
-                lights[i - 1].children[0].material.color.setHex(0xc70039);
-                return;
-            }
-        } else if (i == lights.length - 1) {
-            var previousColor = lights[i - 1].children[0].material.color.getHexString();
-            if (actualColor == normalColor && previousColor == switchedOnColor) {
-                // console.log("turning on in the last");
-                lights[i].children[0].material.color.setHex(0xffbf00);
-                lights[i - 1].children[0].material.color.setHex(0xc70039);
-                return;
-            } 
-        } else { // i = 0
-            var lastLightColor = lights[lights.length - 1].children[0].material.color.getHexString();
-            if (actualColor == normalColor && lastLightColor == switchedOnColor) {
-                lights[lights.length - 1].children[0].material.color.setHex(0xc70039);
-                lights[0].children[0].material.color.setHex(0xffbf00);
-                // console.log("turning on the first one");
-                return;
-            }
-            
-        }
-    }
-}
-
 
 function createBackground() {
     var group = new THREE.Group();
@@ -498,10 +425,17 @@ function createBackground() {
     var plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.y = Math.PI/2;
     plane.name = "plane";
+    group.add(plane);
+
+    // create the path with circles that each flying saucer will follow
+    var path = createCirclesPath();
+    // path.position.y = -35;
+    group.add(path);
 
     // creating flying saucers
     for (var i=0; i<1; i++) {
         var flyingSaucer = createFlyingSaucer();
+        flyingSaucer.name = "flyingSaucer" + (i+1);
         var levitate = flyingSaucer.children[4];
         levitate.name = "levitate" + (i+1);
         sceneElements.flyingSaucerLevitationObjects[levitate.name] = levitate;
@@ -510,7 +444,7 @@ function createBackground() {
         lights.name = "lights" + (i+1);
         sceneElements.flyingSaucerLights[lights.name] = lights;
 
-        flyingSaucer.position.set(-1, 0, 20*i);
+        flyingSaucer.position.set(-1, 78, 0);
         group.add(flyingSaucer);
     }
     // creating particles
@@ -538,7 +472,6 @@ function createBackground() {
         }
     }
 
-    group.add(plane);
     return group;
 }
 
@@ -787,6 +720,122 @@ function rotateParticles() {
     }
 }
 
+function checkIfObjectisVisible(object) {
+    return object.visible == true;
+}
+function turnObjectInvisible(object) {
+    object.visible = false;
+}
+
+function animateAllLevitationFlyingSaucers() {
+    for (var [key, group] of Object.entries(sceneElements.flyingSaucerLevitationObjects)) {
+        animateLevitationFlyingSaucer(group);
+    }      
+}
+
+function animateLevitationFlyingSaucer(group) {
+    var levitateComponents = group.children;
+    for (var i=0; i<levitateComponents.length; i++) {
+        if (i != 0 && i != levitateComponents.length - 1) {
+            if (levitateComponents[i-1].visible && !levitateComponents[i].visible) {
+                // console.log("middle being turned on!");
+                levitateComponents[i].visible = true;
+                return;
+            }
+        } else if (i == 0) {
+            if (!levitateComponents[0].visible) {
+                // console.log("1st being turned on!");
+                levitateComponents[0].visible = true;
+                return;
+            }
+        } else {
+            if (!levitateComponents[levitateComponents.length - 1].visible) {
+                // console.log("last being turned on!");
+                levitateComponents[levitateComponents.length - 1].visible = true;
+                return;
+            } else {
+                // console.log("reset!");
+                levitateComponents.forEach(component => {
+                    component.visible = false;
+                });
+                return;
+            }
+        }       
+    }
+}
+
+function animateAllFlyingSaucerLights() {
+    for (var [key, group] of Object.entries(sceneElements.flyingSaucerLights)) {
+        animateFlyingSaucerLights(group);
+    }
+}
+
+function animateFlyingSaucerLights(group) {
+    var normalColor = new THREE.Color(0xc70039).getHexString();
+    var switchedOnColor = new THREE.Color(0xffbf00).getHexString();
+    var lights = group.children;
+    
+    // console.log(normalColor);
+    // console.log(lights[0].children[0].material.color.getHexString());
+    for (var i=0; i<lights.length; i++) {
+        var actualColor = lights[i].children[0].material.color.getHexString();
+        if (i != 0 && i != lights.length - 1) {
+            var previousColor = lights[i - 1].children[0].material.color.getHexString();
+            if (actualColor == normalColor && previousColor == switchedOnColor) {
+                // console.log("turning on a light in the middle");
+                lights[i].children[0].material.color.setHex(0xffbf00);
+                lights[i - 1].children[0].material.color.setHex(0xc70039);
+                return;
+            }
+        } else if (i == lights.length - 1) {
+            var previousColor = lights[i - 1].children[0].material.color.getHexString();
+            if (actualColor == normalColor && previousColor == switchedOnColor) {
+                // console.log("turning on in the last");
+                lights[i].children[0].material.color.setHex(0xffbf00);
+                lights[i - 1].children[0].material.color.setHex(0xc70039);
+                return;
+            } 
+        } else { // i = 0
+            var lastLightColor = lights[lights.length - 1].children[0].material.color.getHexString();
+            if (actualColor == normalColor && lastLightColor == switchedOnColor) {
+                lights[lights.length - 1].children[0].material.color.setHex(0xc70039);
+                lights[0].children[0].material.color.setHex(0xffbf00);
+                // console.log("turning on the first one");
+                return;
+            }
+            
+        }
+    }
+}
+
+function moveFlyingSaucerToPosition(flyingSaucer, circle) {
+    var dir = new THREE.Vector3(); // create once an reuse it
+    var v2 = new THREE.Vector3(circle.position.x, circle.position.y, circle.position.z);
+    var v1 = new THREE.Vector3(flyingSaucer.position.x, flyingSaucer.position.y, flyingSaucer.position.z);
+    dir.subVectors(v2, v1);
+    flyingSaucer.position.y += dir.y;
+    flyingSaucer.position.z += dir.z;
+}
+
+var circleIndex = 0;
+function animateFlyingSaucerMovement() {
+    if (circleIndex <= sceneElements.circlesPath.length - 1) {
+        var flyingSaucer = sceneElements.sceneGraph.getObjectByName("flyingSaucer1");
+        var circle = sceneElements.circlesPath[circleIndex];
+        moveFlyingSaucerToPosition(flyingSaucer, circle);
+        if (flyingSaucer.position.y == circle.position.y && flyingSaucer.position.z == flyingSaucer.position.z) {
+            // console.log("reached a new position!! " + flyingSaucer.position.y + " " + flyingSaucer.position.z);
+            circleIndex += 1;
+            return;
+        }
+    } else {
+        console.log(circleIndex);
+        circleIndex = 0;
+        return;
+    }
+    
+}
+
 var animateLevitateCounter = 0;
 function computeFrame(time) {
 
@@ -802,6 +851,8 @@ function computeFrame(time) {
         animateAllLevitationFlyingSaucers();
         animateAllFlyingSaucerLights();
         animateLevitateCounter += 1;
+    } else if (animateLevitateCounter % 5 == 0) {
+        animateFlyingSaucerMovement();
     }
     animateLevitateCounter += 1;
 
