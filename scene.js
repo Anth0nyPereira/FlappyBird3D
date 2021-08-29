@@ -372,13 +372,11 @@ function createFlyingSaucer() {
         } else {
             var light = createCircle(0.5, 0xc70039, true, 3);
         }
-        // light.position.set(5.2, -3*Math.sin(i*Math.PI/4.3) - 3.5, -3*Math.cos(i*Math.PI/4.3));
+
         light.position.set(1, -2.5*Math.sin(i*Math.PI/4.3) - 10, -2.5*Math.cos(i*Math.PI/4.3));
-
-        // light.position.set(7, -5, i);
-
         lights.add(light);
     }
+
     lights.scale.set(1, 0.5, 1.5);
     lights.position.y = 2;
     lights.rotation.z = 1;
@@ -439,7 +437,7 @@ function createBackground() {
     group.add(path);
 
     // creating flying saucers
-    for (var i=0; i<1; i++) {
+    for (var i=0; i<4; i++) {
         var flyingSaucer = createFlyingSaucer();
         flyingSaucer.name = "flyingSaucer" + (i+1);
         var levitate = flyingSaucer.children[4];
@@ -824,19 +822,43 @@ function moveFlyingSaucerToPosition(flyingSaucer, circle) {
 }
 
 var circleIndex = 0;
-function animateFlyingSaucerMovement() {
+var circleIndexArray = [0, 0, 0, 0];
+
+function animateAllFlyingSaucerMovement() {
+    for (var i=0; i<4; i++) {
+        if (i == 0) {
+            var firstFlyingSaucer = sceneElements.sceneGraph.getObjectByName("flyingSaucer1");
+            animateFlyingSaucerMovement(firstFlyingSaucer);
+        } else {
+            var actualFlyingSaucer = sceneElements.sceneGraph.getObjectByName("flyingSaucer" + (i+1));
+            var previousFlyingSaucerIndex = circleIndexArray[i-1];
+            var actualFlyingSaucerIndex = circleIndexArray[i];
+            if (Math.abs(actualFlyingSaucerIndex - previousFlyingSaucerIndex) >= 5) {
+                animateFlyingSaucerMovement(actualFlyingSaucer);
+            } else {
+                console.log("previous: " + previousFlyingSaucerIndex);
+                console.log("actual: " + actualFlyingSaucerIndex);
+            }
+        }
+    }
+}
+
+function animateFlyingSaucerMovement(flyingSaucer) {
+    var flyingSaucerName = flyingSaucer.name;
+    var flyingSaucerID = parseInt(flyingSaucerName[flyingSaucerName.length - 1]) - 1;
+    var circleIndex = circleIndexArray[flyingSaucerID];
+    // HERE
     if (circleIndex <= sceneElements.circlesPath.length - 1) {
-        var flyingSaucer = sceneElements.sceneGraph.getObjectByName("flyingSaucer1");
         var circle = sceneElements.circlesPath[circleIndex];
         moveFlyingSaucerToPosition(flyingSaucer, circle);
         if (flyingSaucer.position.y == circle.position.y && flyingSaucer.position.z == flyingSaucer.position.z) {
             // console.log("reached a new position!! " + flyingSaucer.position.y + " " + flyingSaucer.position.z);
-            circleIndex += 1;
+            circleIndexArray[flyingSaucerID] += 1;
             return;
         }
     } else {
         console.log(circleIndex);
-        circleIndex = 0;
+        circleIndexArray[flyingSaucerID] = 0;
         return;
     }
     
@@ -858,7 +880,8 @@ function computeFrame(time) {
         animateAllFlyingSaucerLights();
         animateLevitateCounter += 1;
     } else if (animateLevitateCounter % 5 == 0) {
-        animateFlyingSaucerMovement();
+        // animateFlyingSaucerMovement();
+        animateAllFlyingSaucerMovement();
     }
     animateLevitateCounter += 1;
 
