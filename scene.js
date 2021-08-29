@@ -407,9 +407,9 @@ function createCirclesPath() {
 
     sceneElements.circlesPath = [];
 
-    for (var i=-40; i<40; i+=0.5) {
+    for (var i=-40; i<40; i+=2) {
         var circle = createCircle(0.5);
-        circle.position.set(0, i, 5*Math.cos(i));
+        circle.position.set(0, i, 20*Math.cos(0.2*i));
         group.add(circle);
         sceneElements.circlesPath.unshift(circle);
     }
