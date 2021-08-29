@@ -372,11 +372,17 @@ function createFlyingSaucer() {
         } else {
             var light = createCircle(0.5, 0xc70039, true, 3);
         }
-        light.position.set(8, -3*Math.sin(i*Math.PI/4.3), -3*Math.cos(i*Math.PI/4.3));
+        // light.position.set(5.2, -3*Math.sin(i*Math.PI/4.3) - 3.5, -3*Math.cos(i*Math.PI/4.3));
+        light.position.set(1, -2.5*Math.sin(i*Math.PI/4.3) - 10, -2.5*Math.cos(i*Math.PI/4.3));
+
+        // light.position.set(7, -5, i);
+
         lights.add(light);
     }
-    lights.scale.set(1, 0.7, 1.5);
+    lights.scale.set(1, 0.5, 1.5);
     lights.position.y = 2;
+    lights.rotation.z = 1;
+
 
     // levitation component
     var levitate = new THREE.Group();
