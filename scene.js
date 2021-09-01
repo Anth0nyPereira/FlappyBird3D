@@ -14,6 +14,8 @@ const sceneElements = {
     flyingSaucerLevitationObjects: null,
     flyingSaucerLights: null,
     circlesPath: null,
+    actualScore: null,
+    flyingSaucersCanAppearNow: false,
 };
 
 helper.initEmptyScene(sceneElements);
@@ -547,6 +549,9 @@ function load3DObjects(sceneGraph) {
 
     // Initialize array that will store each obstacle
     sceneElements.obstaclesGroup = [];
+
+    // Initialize variable that will store the actual score
+    sceneElements.actualScore = 0;
 }
 
 // Displacement value
@@ -646,6 +651,9 @@ function increaseScore() {
     var score = document.getElementById("score").textContent;
     score = parseInt(score);
     score += 1;
+
+    sceneElements.actualScore = score; // update current score
+
     score = score.toString();
     var scoreLength = score.toString().length;
     var missingZeros = 3 - scoreLength;
@@ -836,11 +844,17 @@ function animateAllFlyingSaucerMovement() {
             if (Math.abs(actualFlyingSaucerIndex - previousFlyingSaucerIndex) >= 5) {
                 animateFlyingSaucerMovement(actualFlyingSaucer);
             } else {
-                console.log("previous: " + previousFlyingSaucerIndex);
-                console.log("actual: " + actualFlyingSaucerIndex);
+                // console.log("previous: " + previousFlyingSaucerIndex);
+                // console.log("actual: " + actualFlyingSaucerIndex);
             }
         }
     }
+    if (circleIndexArray.filter(index => index == sceneElements.circlesPath.length + 10).length == circleIndexArray.length) {
+        console.log("set to false, cant move");
+        sceneElements.flyingSaucersCanAppearNow = false;
+        return;
+    }
+    console.log(circleIndexArray.filter(index => index == sceneElements.circlesPath.length + 10));
 }
 
 function animateFlyingSaucerMovement(flyingSaucer) {
@@ -857,8 +871,11 @@ function animateFlyingSaucerMovement(flyingSaucer) {
             return;
         }
     } else {
-        console.log(circleIndex);
-        circleIndexArray[flyingSaucerID] = 0;
+        var lastCircleFromPath = sceneElements.circlesPath[sceneElements.circlesPath.length - 1];
+        flyingSaucer.position.y = lastCircleFromPath.position.y;
+        flyingSaucer.position.z = lastCircleFromPath.position.z;
+        circleIndexArray[flyingSaucerID] = sceneElements.circlesPath.length + 10; // 50
+        // circleIndexArray[flyingSaucerID] = 0;
         return;
     }
     
@@ -878,21 +895,30 @@ function computeFrame(time) {
     if (animateLevitateCounter % 20 == 0) {
         animateAllLevitationFlyingSaucers();
         animateAllFlyingSaucerLights();
-        animateLevitateCounter += 1;
-    } else if (animateLevitateCounter % 5 == 0) {
-        // animateFlyingSaucerMovement();
-        animateAllFlyingSaucerMovement();
+    } 
+
+    if (sceneElements.actualScore % 7 == 0 && sceneElements.actualScore != 0) {
+        sceneElements.flyingSaucersCanAppearNow = true;
+    }
+    
+    if (sceneElements.flyingSaucersCanAppearNow) {
+        if (animateLevitateCounter % 5 == 0) {
+            if (circleIndexArray.filter(index => index == sceneElements.circlesPath.length + 10).length == circleIndexArray.length) {
+                circleIndexArray = [0, 0, 0, 0];
+            }
+            animateAllFlyingSaucerMovement();
+        }
     }
     animateLevitateCounter += 1;
 
-    //sceneElements.camera.position.z -= 0.5;
+    sceneElements.camera.position.z -= 0.5;
     sceneElements.control.target = new THREE.Vector3(-Math.pow(10, 10), 0, 0);
 
     var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
-    //rocket.position.z -= 0.5;
+    rocket.position.z -= 0.5;
 
     var background = sceneElements.sceneGraph.getObjectByName("background");
-    //background.position.z -= 0.5;
+    background.position.z -= 0.5;
 
     // Add first couple of obstacles (the rest will be added while removing the old ones)
     if (index < 4) {
