@@ -418,6 +418,7 @@ function createCirclesPath() {
         circle.position.set(0, i, 20*Math.cos(0.2*i));
         group.add(circle);
         sceneElements.circlesPath.unshift(circle);
+        circle.visible = false;
     }
     return group;
 }
@@ -850,11 +851,11 @@ function animateAllFlyingSaucerMovement() {
         }
     }
     if (circleIndexArray.filter(index => index == sceneElements.circlesPath.length + 10).length == circleIndexArray.length) {
-        console.log("set to false, cant move");
+        // console.log("set to false, cant move");
         sceneElements.flyingSaucersCanAppearNow = false;
         return;
     }
-    console.log(circleIndexArray.filter(index => index == sceneElements.circlesPath.length + 10));
+    // console.log(circleIndexArray.filter(index => index == sceneElements.circlesPath.length + 10));
 }
 
 function animateFlyingSaucerMovement(flyingSaucer) {
