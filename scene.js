@@ -436,7 +436,7 @@ function createPlanet(color) {
     var lines = addLineSegment(geometry, 0xdaf7a6, 3.5);
 
     // add ring around the planet
-    var radius =  28, tubeRadius =  0.03, radialSegments = 30, tubularSegments = 100;  
+    var radius =  30, tubeRadius =  0.03, radialSegments = 30, tubularSegments = 100;  
 
     var torusGeometry = new THREE.TorusGeometry(radius, tubeRadius, radialSegments, tubularSegments);
     var torusMaterial = new THREE.MeshBasicMaterial({color: 0xfff300});
@@ -512,14 +512,14 @@ function createBackground() {
 
     // adding the planets
     var planet1 = createPlanet(0xf08000);
-    planet1.position.set(-30, -10, 80);
-    planet1.scale.set(1.4, 3, 1.4);
+    planet1.position.set(-30, -10, 70);
+    planet1.scale.set(1.4, 2.5, 1.4);
     planet1.name = "planet1";
     group.add(planet1);
 
     var planet2 = createPlanet(0x20b2aa);
-    planet2.position.set(-30, -10, -80);
-    planet2.scale.set(1.4, 3, 1.4);
+    planet2.position.set(-30, -10, -70);
+    planet2.scale.set(1.4, 2.5, 1.4);
     planet2.name = "planet2";
     group.add(planet2);
 
@@ -1013,16 +1013,17 @@ function computeFrame(time) {
 
     for (var i=0; i<2; i++) {
         var actualPlanet = sceneElements.sceneGraph.getObjectByName("planet" + (i+1));
+        var rand = randomFromInterval(0, 1)/100;
 
         // planet animation
         if (i == 0) {
-            actualPlanet.rotation.y += randomFromInterval(0, 1)/100;
-            actualPlanet.rotation.z -= randomFromInterval(0, 1)/100;
+            actualPlanet.rotation.y += rand
+            actualPlanet.rotation.z -= rand;
         } else {
-            actualPlanet.rotation.y -= randomFromInterval(0, 1)/100;
-            actualPlanet.rotation.z += randomFromInterval(0, 1)/100;
+            actualPlanet.rotation.y -= rand;
+            actualPlanet.rotation.z += rand;
         }
-        actualPlanet.rotation.x += randomFromInterval(0, 1)/100;
+        actualPlanet.rotation.x += rand;
         
         actualPlanet.children[1].material.color.set(randomColor());
 
@@ -1034,29 +1035,7 @@ function computeFrame(time) {
         ring1.rotation.y -= 0.00002;
 
         ring2.rotation.y += 0.00002;
-        ring2.rotation.z -= 0.00001;
-        /*
-
-        if (i == 0) {
-            ring1.rotation.y += randomFromInterval(0, 1)/100;
-            ring1.rotation.z -= randomFromInterval(0, 1)/100;
-            ring2.rotation.y += randomFromInterval(0, 1)/100;
-            ring2.rotation.z -= randomFromInterval(0, 1)/100;
-
-            ring1.rotation.x += randomFromInterval(0, 1)/100;
-            ring2.rotation.x += randomFromInterval(0, 1)/100;
-        } else {
-            ring1.rotation.y += randomFromInterval(0, 1)/100;
-            ring1.rotation.z += randomFromInterval(0, 1)/100;
-            ring2.rotation.y += randomFromInterval(0, 1)/100;
-            ring2.rotation.z += randomFromInterval(0, 1)/100;
-
-            ring1.rotation.x -= randomFromInterval(0, 1)/100;
-            ring2.rotation.x -= randomFromInterval(0, 1)/100;
-        }
-        */
-        
-        
+        ring2.rotation.z -= 0.00001;    
     }
 
     // Rendering
