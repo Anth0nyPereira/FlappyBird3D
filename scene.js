@@ -426,7 +426,8 @@ function createCirclesPath() {
 function createPlanet(color) {
     var group = new THREE.Group();
 
-    const radius = 25, widthSegments = 17, heightSegments = 17;
+    // the planet itself including the line segments
+    var radius = 25, widthSegments = 17, heightSegments = 17;
     
     var geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
     var material = new THREE.MeshBasicMaterial({color: color});
@@ -434,8 +435,22 @@ function createPlanet(color) {
 
     var lines = addLineSegment(geometry, 0xdaf7a6, 3.5);
 
+    // add ring around the planet
+    var radius =  28, tubeRadius =  0.03, radialSegments = 30, tubularSegments = 100;  
+
+    var torusGeometry = new THREE.TorusGeometry(radius, tubeRadius, radialSegments, tubularSegments);
+    var torusMaterial = new THREE.MeshBasicMaterial({color: 0xfff300});
+    var ring1 = new THREE.Mesh(torusGeometry, torusMaterial);
+    ring1.position.x = 10;
+    ring1.rotation.z = Math.PI/2;
+    var ring2 = new THREE.Mesh(torusGeometry, torusMaterial);
+    ring2.position.x = 10;
+    ring2.rotation.x = Math.PI/2;
+
     group.add(mesh);
     group.add(lines);
+    group.add(ring1);
+    group.add(ring2);
     return group;
 }
 
@@ -495,12 +510,12 @@ function createBackground() {
         }
     }
 
-    // adding the planet
-    var planet = createPlanet(0xf08000);
-    planet.position.set(-30, -10, 80);
-    planet.scale.set(1.4, 3, 1.4);
-    planet.name = "planet";
-    group.add(planet);
+    // adding the planets
+    var planet1 = createPlanet(0xf08000);
+    planet1.position.set(-30, -10, 80);
+    planet1.scale.set(1.4, 3, 1.4);
+    planet1.name = "planet1";
+    group.add(planet1);
 
     var planet2 = createPlanet(0x20b2aa);
     planet2.position.set(-30, -10, -80);
@@ -996,18 +1011,53 @@ function computeFrame(time) {
         rocketFlag = true;
     }
 
-    // rotating the planet
-    var planet = sceneElements.sceneGraph.getObjectByName("planet");
-    planet.rotation.x += randomFromInterval(0, 1)/100;
-    planet.rotation.y += randomFromInterval(0, 1)/100;
-    planet.rotation.z -= randomFromInterval(0, 1)/100;
-    planet.children[1].material.color.set(randomColor());
+    for (var i=0; i<2; i++) {
+        var actualPlanet = sceneElements.sceneGraph.getObjectByName("planet" + (i+1));
 
-    var planet2 = sceneElements.sceneGraph.getObjectByName("planet2");
-    planet2.rotation.x += randomFromInterval(0, 1)/100;
-    planet2.rotation.y -= randomFromInterval(0, 1)/100;
-    planet2.rotation.z += randomFromInterval(0, 1)/100;
-    planet2.children[1].material.color.set(randomColor());
+        // planet animation
+        if (i == 0) {
+            actualPlanet.rotation.y += randomFromInterval(0, 1)/100;
+            actualPlanet.rotation.z -= randomFromInterval(0, 1)/100;
+        } else {
+            actualPlanet.rotation.y -= randomFromInterval(0, 1)/100;
+            actualPlanet.rotation.z += randomFromInterval(0, 1)/100;
+        }
+        actualPlanet.rotation.x += randomFromInterval(0, 1)/100;
+        
+        actualPlanet.children[1].material.color.set(randomColor());
+
+        // rings animation
+        var ring1 = actualPlanet.children[2];
+        var ring2 = actualPlanet.children[3];
+
+        ring1.rotation.x += 0.00001;
+        ring1.rotation.y -= 0.00002;
+
+        ring2.rotation.y += 0.00002;
+        ring2.rotation.z -= 0.00001;
+        /*
+
+        if (i == 0) {
+            ring1.rotation.y += randomFromInterval(0, 1)/100;
+            ring1.rotation.z -= randomFromInterval(0, 1)/100;
+            ring2.rotation.y += randomFromInterval(0, 1)/100;
+            ring2.rotation.z -= randomFromInterval(0, 1)/100;
+
+            ring1.rotation.x += randomFromInterval(0, 1)/100;
+            ring2.rotation.x += randomFromInterval(0, 1)/100;
+        } else {
+            ring1.rotation.y += randomFromInterval(0, 1)/100;
+            ring1.rotation.z += randomFromInterval(0, 1)/100;
+            ring2.rotation.y += randomFromInterval(0, 1)/100;
+            ring2.rotation.z += randomFromInterval(0, 1)/100;
+
+            ring1.rotation.x -= randomFromInterval(0, 1)/100;
+            ring2.rotation.x -= randomFromInterval(0, 1)/100;
+        }
+        */
+        
+        
+    }
 
     // Rendering
     helper.render(sceneElements);
