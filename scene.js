@@ -423,6 +423,22 @@ function createCirclesPath() {
     return group;
 }
 
+function createPlanet(color) {
+    var group = new THREE.Group();
+
+    const radius = 25, widthSegments = 17, heightSegments = 17;
+    
+    var geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+    var material = new THREE.MeshBasicMaterial({color: color});
+    var mesh = new THREE.Mesh(geometry, material);
+
+    var lines = addLineSegment(geometry, 0xdaf7a6, 3.5);
+
+    group.add(mesh);
+    group.add(lines);
+    return group;
+}
+
 function createBackground() {
     var group = new THREE.Group();
 
@@ -478,6 +494,19 @@ function createBackground() {
             star.visible = false;
         }
     }
+
+    // adding the planet
+    var planet = createPlanet(0xf08000);
+    planet.position.set(-30, -10, 80);
+    planet.scale.set(1.4, 3, 1.4);
+    planet.name = "planet";
+    group.add(planet);
+
+    var planet2 = createPlanet(0x20b2aa);
+    planet2.position.set(-30, -10, -80);
+    planet2.scale.set(1.4, 3, 1.4);
+    planet2.name = "planet2";
+    group.add(planet2);
 
     return group;
 }
@@ -966,6 +995,19 @@ function computeFrame(time) {
         rocket.position.y -= 3*deltaRocketY;
         rocketFlag = true;
     }
+
+    // rotating the planet
+    var planet = sceneElements.sceneGraph.getObjectByName("planet");
+    planet.rotation.x += randomFromInterval(0, 1)/100;
+    planet.rotation.y += randomFromInterval(0, 1)/100;
+    planet.rotation.z -= randomFromInterval(0, 1)/100;
+    planet.children[1].material.color.set(randomColor());
+
+    var planet2 = sceneElements.sceneGraph.getObjectByName("planet2");
+    planet2.rotation.x += randomFromInterval(0, 1)/100;
+    planet2.rotation.y -= randomFromInterval(0, 1)/100;
+    planet2.rotation.z += randomFromInterval(0, 1)/100;
+    planet2.children[1].material.color.set(randomColor());
 
     // Rendering
     helper.render(sceneElements);
