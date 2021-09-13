@@ -622,8 +622,6 @@ var obstaclePositionLater = -100;
 
 var obstacleID = 1;
 
-var gameOver = true;
-
 var index = 0;
 
 var animateBackgroundCounter = 0;
@@ -650,9 +648,9 @@ function rocketIntersectsObstacle() {
     var raycaster = new THREE.Raycaster();
     raycaster.set(new THREE.Vector3(rocket.position.x, rocket.position.y, rocket.position.z), new THREE.Vector3(-1, 0, 0));
     if (sceneElements.obstaclesGroup.length > 0) {
-        for (var i=parseInt(sceneElements.obstaclesGroup[0].name); i<parseInt(sceneElements.obstaclesGroup[sceneElements.obstaclesGroup.length - 1].name); i++) {
-            var intersects = raycaster.intersectObjects(sceneElements.obstaclesGroup[0].children, true); // true -> means recursively checking its children
-            if (intersects.length > 0 && gameOver) {
+        for (var obstacle of sceneElements.obstaclesGroup) {
+            var intersects = raycaster.intersectObjects(obstacle.children, true); // true -> means recursively checking its children
+            if (intersects.length > 0) {
                 return true;
             }
         }
@@ -975,6 +973,8 @@ function computeFrame(time) {
     if (rocketIntersectsObstacle()) {
         traverseAllMeshes();
         return;
+    } else {
+        console.log("is false!!");
     }
 
     // rotateParticles();
