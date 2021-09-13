@@ -16,6 +16,7 @@ const sceneElements = {
     circlesPath: null,
     actualScore: null,
     flyingSaucersCanAppearNow: false,
+    allPrimitives: null,
 };
 
 helper.initEmptyScene(sceneElements);
@@ -405,6 +406,7 @@ function createFlyingSaucer() {
     group.add(levitate);
 
     group.scale.set(0.8, 0.8, 0.8);
+
     return group;
 }
 
@@ -541,6 +543,9 @@ function randomFromInterval(min, max) {
 }
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
+
+    // Initialize array that will contain every existing primitive in the scene
+    sceneElements.allPrimitives = [];
 
     // Add axes helper
     var axesHelper = new THREE.AxesHelper(500);
@@ -926,10 +931,11 @@ function animateFlyingSaucerMovement(flyingSaucer) {
     
 }
 
-function convertColorToGrayscale(color) {
+function convertColorToGrayscale(mesh) {
+    var color = mesh.material.color;
     var colorStyleString = color.getStyle();
     colorStyleString = colorStyleString.slice(4, -1);
-    var colorSPlitArray = colorStyleString.split(",");
+    var colorSplitArray = colorStyleString.split(",");
 
     var total = 0;
     colorSplitArray.forEach(number => {
@@ -940,10 +946,20 @@ function convertColorToGrayscale(color) {
     // FORMULA: Grayscale  = 0.299R + 0.587G + 0.114B
     // https://www.dynamsoft.com/blog/insights/image-processing/image-processing-101-color-space-conversion/
 
-    var grayscale = 0.299 * colorSPlitArray[0] + 0.587 * colorSPlitArray[1] + 0.114 * colorSPlitArray[2];
+    var grayscale = 0.299 * colorSplitArray[0] + 0.587 * colorSplitArray[1] + 0.114 * colorSplitArray[2];
+    grayscale = grayscale/255;
 
-    var newColorStyleString = "rgb(" + grayscale + ", " + grayscale + ", " + grayscale  + ")";
-    color.setStyle(newColorStyleString);
+    mesh.material.color.setRGB(grayscale, grayscale, grayscale);
+    // console.log(mesh.material.color);
+}
+
+function traverseAllMeshes() {
+    sceneElements.sceneGraph.traverse(function(element) {
+        if (element instanceof THREE.Mesh || element instanceof THREE.LineSegments) {
+            convertColorToGrayscale(element);
+        }
+    });
+    helper.render(sceneElements);
 }
 
 var animateLevitateCounter = 0;
@@ -957,6 +973,7 @@ function computeFrame(time) {
     checkIfRocketSurpassedObstacle();
 
     if (rocketIntersectsObstacle()) {
+        traverseAllMeshes();
         return;
     }
 
