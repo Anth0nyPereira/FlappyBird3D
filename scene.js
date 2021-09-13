@@ -926,6 +926,26 @@ function animateFlyingSaucerMovement(flyingSaucer) {
     
 }
 
+function convertColorToGrayscale(color) {
+    var colorStyleString = color.getStyle();
+    colorStyleString = colorStyleString.slice(4, -1);
+    var colorSPlitArray = colorStyleString.split(",");
+
+    var total = 0;
+    colorSplitArray.forEach(number => {
+        number = parseInt(number);
+        total = total + number;
+    });
+
+    // FORMULA: Grayscale  = 0.299R + 0.587G + 0.114B
+    // https://www.dynamsoft.com/blog/insights/image-processing/image-processing-101-color-space-conversion/
+
+    var grayscale = 0.299 * colorSPlitArray[0] + 0.587 * colorSPlitArray[1] + 0.114 * colorSPlitArray[2];
+
+    var newColorStyleString = "rgb(" + grayscale + ", " + grayscale + ", " + grayscale  + ")";
+    color.setStyle(newColorStyleString);
+}
+
 var animateLevitateCounter = 0;
 function computeFrame(time) {
 
