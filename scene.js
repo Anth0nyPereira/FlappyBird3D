@@ -648,11 +648,11 @@ function rocketIntersectsObstacle() {
         for (var i=parseInt(sceneElements.obstaclesGroup[0].name); i<parseInt(sceneElements.obstaclesGroup[sceneElements.obstaclesGroup.length - 1].name); i++) {
             var intersects = raycaster.intersectObjects(sceneElements.obstaclesGroup[0].children, true); // true -> means recursively checking its children
             if (intersects.length > 0 && gameOver) {
-                alert("GAME OVER!");
-                gameOver = false;
+                return true;
             }
         }
-    }  
+    } 
+    return false; 
 }
 
 function removePreviousObstacles() {
@@ -931,10 +931,15 @@ function computeFrame(time) {
 
     //updateBackgroundColor();
 
-    rocketIntersectsObstacle();
+    
     removePreviousObstacles();
     animateBackground();
     checkIfRocketSurpassedObstacle();
+
+    if (rocketIntersectsObstacle()) {
+        return;
+    }
+
     // rotateParticles();
 
     if (animateLevitateCounter % 20 == 0) {
