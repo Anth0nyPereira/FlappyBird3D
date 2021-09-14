@@ -45,23 +45,29 @@ body {
 	margin-left: 5%;
 }
 #yes {
-	background: none;
+	background-image: none;
 	padding-left: 3%;
 	padding-right: 3%;
-	border-radius: 25px 50px;
 }
 
 #yes:hover {
-	background: #FFBF00;
+	background-image: url("resources/star-solid.svg");
+	background-repeat: no-repeat;
+	background-size: auto;
+	background-position: center;
+	cursor: pointer;
 }
 
 #no {
-	background: none;
+	background-image: none;
 	padding-left: 5%;
 	padding-right: 5%;
-	border-radius: 50px 25px;
 }
 
 #no:hover {
-	background: #FFBF00;
+	background-image: url("resources/star-solid.svg");
+	background-repeat: no-repeat;
+	background-size: auto;
+	background-position: center;
+	cursor: pointer;
 }

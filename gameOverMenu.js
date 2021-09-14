@@ -3,5 +3,5 @@ function reloadGame() {
 }
 
 function quitGame() {
-    location.close();
+    window.close();
 }
