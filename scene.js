@@ -16,6 +16,7 @@ const sceneElements = {
     circlesPath: null,
     actualScore: null,
     flyingSaucersCanAppearNow: false,
+    allPrimitives: null,
 };
 
 helper.initEmptyScene(sceneElements);
@@ -28,8 +29,8 @@ requestAnimationFrame(computeFrame);
 
 window.addEventListener('resize', resizeWindow);
 
-//To keep track of the keyboard - WASD
-var space = false;
+var space = false, arrowLeft = false, arrowRight = false, enter = false;
+
 document.addEventListener('keydown', onDocumentKeyDown, false);
 document.addEventListener('keyup', onDocumentKeyUp, false);
 
@@ -49,12 +50,30 @@ function onDocumentKeyDown(event) {
         case 32: // space
             space = true;
             break;
+        case 37: // arrow left
+            arrowLeft = true;
+            break;
+        case 39: // arrow right
+            arrowRight = true;
+            break;
+        case 13: // enter
+            enter = true;
+            break;
     }
 }
 function onDocumentKeyUp(event) {
     switch (event.keyCode) {
         case 32: // space
             space = false;
+            break;
+        case 37: // arrow left
+            arrowLeft = false;
+            break;
+        case 39: // arrow right
+            arrowRight = false;
+            break;
+        case 13: // enter
+            enter = false;
             break;
     }
 }
@@ -405,6 +424,7 @@ function createFlyingSaucer() {
     group.add(levitate);
 
     group.scale.set(0.8, 0.8, 0.8);
+
     return group;
 }
 
@@ -542,6 +562,9 @@ function randomFromInterval(min, max) {
 // Create and insert in the scene graph the models of the 3D scene
 function load3DObjects(sceneGraph) {
 
+    // Initialize array that will contain every existing primitive in the scene
+    sceneElements.allPrimitives = [];
+
     // Add axes helper
     var axesHelper = new THREE.AxesHelper(500);
     sceneElements.sceneGraph.add(axesHelper);
@@ -617,8 +640,6 @@ var obstaclePositionLater = -100;
 
 var obstacleID = 1;
 
-var gameOver = true;
-
 var index = 0;
 
 var animateBackgroundCounter = 0;
@@ -645,14 +666,14 @@ function rocketIntersectsObstacle() {
     var raycaster = new THREE.Raycaster();
     raycaster.set(new THREE.Vector3(rocket.position.x, rocket.position.y, rocket.position.z), new THREE.Vector3(-1, 0, 0));
     if (sceneElements.obstaclesGroup.length > 0) {
-        for (var i=parseInt(sceneElements.obstaclesGroup[0].name); i<parseInt(sceneElements.obstaclesGroup[sceneElements.obstaclesGroup.length - 1].name); i++) {
-            var intersects = raycaster.intersectObjects(sceneElements.obstaclesGroup[0].children, true); // true -> means recursively checking its children
-            if (intersects.length > 0 && gameOver) {
-                alert("GAME OVER!");
-                gameOver = false;
+        for (var obstacle of sceneElements.obstaclesGroup) {
+            var intersects = raycaster.intersectObjects(obstacle.children, true); // true -> means recursively checking its children
+            if (intersects.length > 0) {
+                return true;
             }
         }
-    }  
+    } 
+    return false; 
 }
 
 function removePreviousObstacles() {
@@ -926,15 +947,59 @@ function animateFlyingSaucerMovement(flyingSaucer) {
     
 }
 
+function convertColorToGrayscale(mesh) {
+    var color = mesh.material.color;
+    var colorStyleString = color.getStyle();
+    colorStyleString = colorStyleString.slice(4, -1);
+    var colorSplitArray = colorStyleString.split(",");
+
+    var total = 0;
+    colorSplitArray.forEach(number => {
+        number = parseInt(number);
+        total = total + number;
+    });
+
+    // FORMULA: Grayscale  = 0.299R + 0.587G + 0.114B
+    // https://www.dynamsoft.com/blog/insights/image-processing/image-processing-101-color-space-conversion/
+
+    var grayscale = 0.299 * colorSplitArray[0] + 0.587 * colorSplitArray[1] + 0.114 * colorSplitArray[2];
+    grayscale = grayscale/255;
+
+    mesh.material.color.setRGB(grayscale, grayscale, grayscale);
+    // console.log(mesh.material.color);
+}
+
+function traverseAllMeshes() {
+    sceneElements.sceneGraph.traverse(function(element) {
+        if (element instanceof THREE.Mesh || element instanceof THREE.LineSegments) {
+            convertColorToGrayscale(element);
+        }
+    });
+    helper.render(sceneElements);
+}
+
+function showGameOverMenu() {
+    var gameOverMenu = document.getElementById("game_over");
+    gameOverMenu.style.display = "block";
+}
+
 var animateLevitateCounter = 0;
 function computeFrame(time) {
 
     //updateBackgroundColor();
 
-    rocketIntersectsObstacle();
+    
     removePreviousObstacles();
     animateBackground();
     checkIfRocketSurpassedObstacle();
+
+    var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
+    if (rocketIntersectsObstacle() || rocket.position.y >= 72 || rocket.position.y <= 5) {
+        traverseAllMeshes();
+        showGameOverMenu();
+        return;
+    } 
+
     // rotateParticles();
 
     if (animateLevitateCounter % 20 == 0) {

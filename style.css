@@ -15,3 +15,60 @@ body {
 	color: white; 
 	font-size: 3vw;
 }
+
+#game_over {
+	font-family: SpaceAge;
+	position: absolute;
+	width: 600px;
+	height: 200px;
+	z-index: 99;
+	top: 30%;
+	left:50%;
+	margin: -100px 0 0 -300px;
+	display: none;
+	text-align: center;
+}
+
+#game_over_text {
+	color: red;
+	font-size: 5vw;
+}
+
+.try_again {
+	color: white;
+	font-size: 3vw;
+	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.answer {
+	border-radius: 25px;
+	margin-right: 5%;
+	margin-left: 5%;
+}
+#yes {
+	background-image: none;
+	padding-left: 3%;
+	padding-right: 3%;
+}
+
+#yes:hover {
+	background-image: url("resources/star-solid.svg");
+	background-repeat: no-repeat;
+	background-size: auto;
+	background-position: center;
+	cursor: pointer;
+}
+
+#no {
+	background-image: none;
+	padding-left: 5%;
+	padding-right: 5%;
+}
+
+#no:hover {
+	background-image: url("resources/star-solid.svg");
+	background-repeat: no-repeat;
+	background-size: auto;
+	background-position: center;
+	cursor: pointer;
+}
