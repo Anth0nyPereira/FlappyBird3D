@@ -15,3 +15,43 @@ body {
 	color: white; 
 	font-size: 3vw;
 }
+
+#game_over {
+	font-family: SpaceAge;
+	position: absolute;
+	width: 600px;
+	height: 200px;
+	z-index: 99;
+	top: 30%;
+	left:50%;
+	margin: -100px 0 0 -300px;
+	display: none;
+	text-align: center;
+}
+
+#game_over_text {
+	color: red;
+	font-size: 5vw;
+}
+
+.try_again {
+	color: white;
+	font-size: 3vw;
+}
+
+#yes {
+	border-radius: 25px;
+	background-color: #FFBF00;
+	margin-right: 5%;
+	padding-left: 3%;
+	padding-right: 3%;
+}
+
+#no {
+	border-radius: 25px;
+	background-color: none;
+	margin-left: 5%;
+	padding-left: 5%;
+	padding-right: 5%;
+}
+

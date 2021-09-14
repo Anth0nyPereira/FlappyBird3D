@@ -960,6 +960,11 @@ function traverseAllMeshes() {
     helper.render(sceneElements);
 }
 
+function showGameOverMenu() {
+    var gameOverMenu = document.getElementById("game_over");
+    gameOverMenu.style.display = "block";
+}
+
 var animateLevitateCounter = 0;
 function computeFrame(time) {
 
@@ -972,6 +977,7 @@ function computeFrame(time) {
 
     if (rocketIntersectsObstacle()) {
         traverseAllMeshes();
+        showGameOverMenu();
         return;
     } else {
         console.log("is false!!");
