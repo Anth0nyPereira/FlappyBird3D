@@ -982,27 +982,6 @@ function showGameOverMenu() {
     var gameOverMenu = document.getElementById("game_over");
     gameOverMenu.style.display = "block";
 }
-/*
-function tryAgain() {
-    var yes = document.getElementById("yes");
-    var no = document.getElementById("no");
-    if (arrowRight && yes.classList.contains("yes_background")) {
-        yes.classList.add("yes_no_background");
-        yes.classList.remove("yes_background");
-        no.classList.add("no_background");
-        no.classList.remove("no_no_background");
-    } else if (arrowLeft && no.classList.contains("no_background")) {
-        yes.classList.remove("yes_no_background");
-        yes.classList.add("yes_background");
-        no.classList.remove("no_background");
-        no.classList.add("no_no_background");
-    }
-
-    if (enter && yes.classList.contains("yes_background")) { // reload page
-    } else if (enter && no.classList.contains("no_background")) { // close window
-    }
-}
-*/
 
 var animateLevitateCounter = 0;
 function computeFrame(time) {
