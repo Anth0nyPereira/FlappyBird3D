@@ -993,13 +993,12 @@ function computeFrame(time) {
     animateBackground();
     checkIfRocketSurpassedObstacle();
 
-    if (rocketIntersectsObstacle()) {
+    var rocket = sceneElements.sceneGraph.getObjectByName("rocket");
+    if (rocketIntersectsObstacle() || rocket.position.y >= 72 || rocket.position.y <= 5) {
         traverseAllMeshes();
         showGameOverMenu();
         return;
-    } else {
-        console.log("is false!!");
-    }
+    } 
 
     // rotateParticles();
 
