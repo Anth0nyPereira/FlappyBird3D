@@ -39,19 +39,29 @@ body {
 	font-size: 3vw;
 }
 
-#yes {
+.answer {
 	border-radius: 25px;
-	background-color: #FFBF00;
 	margin-right: 5%;
+	margin-left: 5%;
+}
+#yes {
+	background: none;
 	padding-left: 3%;
 	padding-right: 3%;
+	border-radius: 25px 50px;
+}
+
+#yes:hover {
+	background: #FFBF00;
 }
 
 #no {
-	border-radius: 25px;
-	background-color: none;
-	margin-left: 5%;
+	background: none;
 	padding-left: 5%;
 	padding-right: 5%;
+	border-radius: 50px 25px;
 }
 
+#no:hover {
+	background: #FFBF00;
+}

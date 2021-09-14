@@ -16,6 +16,7 @@
 
 	<script type="text/javascript" src="helper.js" defer></script>
 	<script type="text/javascript" src="scene.js" defer></script>
+	<script type="text/javascript" src="gameOverMenu.js" defer></script>
 </head>
 
 <body>
@@ -24,7 +25,7 @@
 		<div id="game_over">
 			<p id="game_over_text">Game Over!</p>
 			<p class="try_again">Try Again?</p>
-			<div class="try_again"><span id="yes">YES</span><span id="no">NO</span></div>
+			<div class="try_again"><span onclick="reloadGame()" id="yes">YES</span><span onclick="quitGame()" id="no">NO</span></div>
 		</div>
 	</div>
 </body>

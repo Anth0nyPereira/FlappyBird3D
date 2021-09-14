@@ -29,8 +29,8 @@ requestAnimationFrame(computeFrame);
 
 window.addEventListener('resize', resizeWindow);
 
-//To keep track of the keyboard - WASD
-var space = false;
+var space = false, arrowLeft = false, arrowRight = false, enter = false;
+
 document.addEventListener('keydown', onDocumentKeyDown, false);
 document.addEventListener('keyup', onDocumentKeyUp, false);
 
@@ -50,12 +50,30 @@ function onDocumentKeyDown(event) {
         case 32: // space
             space = true;
             break;
+        case 37: // arrow left
+            arrowLeft = true;
+            break;
+        case 39: // arrow right
+            arrowRight = true;
+            break;
+        case 13: // enter
+            enter = true;
+            break;
     }
 }
 function onDocumentKeyUp(event) {
     switch (event.keyCode) {
         case 32: // space
             space = false;
+            break;
+        case 37: // arrow left
+            arrowLeft = false;
+            break;
+        case 39: // arrow right
+            arrowRight = false;
+            break;
+        case 13: // enter
+            enter = false;
             break;
     }
 }
@@ -964,6 +982,27 @@ function showGameOverMenu() {
     var gameOverMenu = document.getElementById("game_over");
     gameOverMenu.style.display = "block";
 }
+/*
+function tryAgain() {
+    var yes = document.getElementById("yes");
+    var no = document.getElementById("no");
+    if (arrowRight && yes.classList.contains("yes_background")) {
+        yes.classList.add("yes_no_background");
+        yes.classList.remove("yes_background");
+        no.classList.add("no_background");
+        no.classList.remove("no_no_background");
+    } else if (arrowLeft && no.classList.contains("no_background")) {
+        yes.classList.remove("yes_no_background");
+        yes.classList.add("yes_background");
+        no.classList.remove("no_background");
+        no.classList.add("no_no_background");
+    }
+
+    if (enter && yes.classList.contains("yes_background")) { // reload page
+    } else if (enter && no.classList.contains("no_background")) { // close window
+    }
+}
+*/
 
 var animateLevitateCounter = 0;
 function computeFrame(time) {
