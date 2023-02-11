@@ -31,6 +31,8 @@ window.addEventListener('resize', resizeWindow);
 
 var space = false, arrowLeft = false, arrowRight = false, enter = false;
 
+var lockFlag = true;
+
 document.addEventListener('keydown', onDocumentKeyDown, false);
 document.addEventListener('keyup', onDocumentKeyUp, false);
 
@@ -984,10 +986,9 @@ function showGameOverMenu() {
 }
 
 var animateLevitateCounter = 0;
-function computeFrame(time) {
+function computeFrame(time, counter=0) {
 
     //updateBackgroundColor();
-
     
     removePreviousObstacles();
     animateBackground();
@@ -1064,10 +1065,10 @@ function computeFrame(time) {
 
             animateRocketFire();
 
-            rocket.position.y += 6*deltaRocketY;
+            rocket.position.y += 3.5*deltaRocketY;
         } else if (!rocketFlag) {
             sceneElements.sceneGraph.getObjectByName("fire").visible = false;
-            rocket.position.y -= 3*deltaRocketY;
+            rocket.position.y -= 4.5*deltaRocketY;
         }
         
 
@@ -1107,7 +1108,17 @@ function computeFrame(time) {
     helper.render(sceneElements);
 
     // NEW --- Update control of the camera
-    sceneElements.control.update();
+    
+    if (lockFlag) {
+        sceneElements.control.update();
+        sceneElements.control.saveState();
+    } else {
+        sceneElements.control.reset();
+    }
+
+    sceneElements.camera.position.z = sceneElements.sceneGraph.getObjectByName("rocket").position.z;
+    console.log(sceneElements.camera.position);
+    console.log(sceneElements.sceneGraph.getObjectByName("rocket").position);
 
     // Call for the next frame
     requestAnimationFrame(computeFrame);
