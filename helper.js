@@ -3,7 +3,6 @@
 const helper = {
 
     initEmptyScene: function (sceneElements) {
-
         // Create the 3D scene
         sceneElements.sceneGraph = new THREE.Scene();
 
